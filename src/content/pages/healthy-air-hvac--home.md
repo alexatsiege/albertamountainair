@@ -5,7 +5,7 @@ metaDescription: "Alberta Mountain Air provides furnace repair, AC service, inst
 schema: ["HVACBusiness"]
 
 heroTemplate: "trust"
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 heroHeadline: "Calgary's Trusted|Heating & Cooling Team"
 heroSubheadline: "From emergency furnace repairs to air conditioning installs, Alberta Mountain Air keeps Calgary homes comfortable in every season with fast response times and honest service."
 heroBullets:

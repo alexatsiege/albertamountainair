@@ -10,7 +10,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "COOL AIR|FAST HELP"
 heroHeadline: "Expert|AC Repair"
 heroSubheadline: "If your air conditioner is not cooling properly, Alberta Mountain Air can diagnose the issue and help restore comfort with dependable repair service."

@@ -12,7 +12,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "CALGARY|AC UPGRADE"
 heroHeadline: "AC Replacement in|Calgary"
 heroSubheadline: "When your cooling system is no longer reliable, Alberta Mountain Air helps Calgary homeowners compare replacement options that make sense."

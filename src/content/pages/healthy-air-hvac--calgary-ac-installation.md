@@ -12,7 +12,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "CALGARY|NEW AC"
 heroHeadline: "AC Installation in|Calgary"
 heroSubheadline: "Alberta Mountain Air helps Calgary homeowners plan and install cooling systems built for dependable summer comfort and long-term performance."

@@ -12,7 +12,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "FAST|AC REPAIR"
 heroHeadline: "AC Repair in|Calgary"
 heroSubheadline: "When your air conditioner stops cooling, Alberta Mountain Air delivers fast diagnostics, clear recommendations, and dependable repairs across Calgary."

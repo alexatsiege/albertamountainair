@@ -10,7 +10,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "TRUSTED|LOCAL HVAC"
 heroHeadline: "Your Calgary|HVAC Contractor"
 heroSubheadline: "From furnace repairs to AC installations, Alberta Mountain Air is the Calgary HVAC contractor homeowners call for dependable service and practical solutions."

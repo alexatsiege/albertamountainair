@@ -10,7 +10,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "LOCAL|HOME COMFORT"
 heroHeadline: "An HVAC Company|Near You"
 heroSubheadline: "Alberta Mountain Air serves Calgary-area homeowners with dependable heating and cooling service, clear communication, and comfort-focused recommendations."

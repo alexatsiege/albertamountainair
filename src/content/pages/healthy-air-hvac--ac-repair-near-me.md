@@ -10,7 +10,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "LOCAL|COOLING HELP"
 heroHeadline: "AC Repair|Near You"
 heroSubheadline: "Alberta Mountain Air helps Calgary-area homeowners troubleshoot cooling issues quickly and get dependable repair service when comfort matters."

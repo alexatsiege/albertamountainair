@@ -10,7 +10,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "LOCAL|AC REPLACEMENT"
 heroHeadline: "AC Replacement|Near You"
 heroSubheadline: "Alberta Mountain Air works with Calgary-area homeowners to replace older or unreliable cooling systems with options that better fit the home."

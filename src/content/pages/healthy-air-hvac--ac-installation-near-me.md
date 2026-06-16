@@ -10,7 +10,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "FREE|INSTALL QUOTE"
 heroHeadline: "AC Installation|Near You"
 heroSubheadline: "Alberta Mountain Air provides air conditioning installation for Calgary-area homeowners who want dependable cooling and clear system recommendations."

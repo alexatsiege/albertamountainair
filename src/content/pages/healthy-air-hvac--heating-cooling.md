@@ -10,7 +10,7 @@ headerVariant: "ppc"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true
-heroBg: "/_assets/HERO-BG.webp"
+heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "YEAR-ROUND|COMFORT"
 heroHeadline: "Heating & Cooling|For Calgary Homes"
 heroSubheadline: "Alberta Mountain Air helps homeowners stay comfortable through every season with dependable heating and cooling service."
