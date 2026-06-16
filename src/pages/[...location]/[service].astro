@@ -1,0 +1,454 @@
+---
+// src/pages/[location]/[service].astro
+// Dynamic route for landing pages — generates pages at /[location]/[service]
+// e.g. /fort-lauderdale/ac-repair
+
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import HeaderPPC from '../../components/HeaderPPC.astro';
+import Footer from '../../components/Footer.astro';
+import FooterPPC from '../../components/FooterPPC.astro';
+import HeroTrust from '../../components/HeroTrust.astro';
+import FiftyFifty from '../../components/FiftyFifty.astro';
+import FiftyFiftyForm from '../../components/FiftyFiftyForm.astro';
+import ServicesCategorizedSplit from '../../components/ServicesCategorizedSplit.astro';
+import ServiceArea from '../../components/ServiceArea.astro';
+import Reviews from '../../components/Reviews.astro';
+import CTA from '../../components/CTA.astro';
+import SectionDivider from '../../components/SectionDivider.astro';
+import AirflowParticles from '../../components/AirflowParticles.astro';
+import QualifyForm from '../../components/QualifyForm.astro';
+import DealerLogos from '../../components/DealerLogos.astro';
+import ServiceContent from '../../components/ServiceContent.astro';
+import TeamSpotlight from '../../components/TeamSpotlight.astro';
+import SymptomsGrid from '../../components/SymptomsGrid.astro';
+import ServiceAreaMap from '../../components/ServiceAreaMap.astro';
+import CompanyVideo from '../../components/CompanyVideo.astro';
+import RecentServiceActivity from '../../components/RecentServiceActivity.astro';
+import CostPricing from '../../components/CostPricing.astro';
+import ProcessTimeline from '../../components/ProcessTimeline.astro';
+import MultiStepQuoteForm from '../../components/MultiStepQuoteForm.astro';
+import TrustBar from '../../components/TrustBar.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import { FORMS, PHONES } from '../../content/formRegistry';
+
+export async function getStaticPaths() {
+  const pages = await getCollection('pages');
+  const clients = await getCollection('clients');
+
+  // Filter for pages that have BOTH a form (formId or legacy contactLocation) and serviceSlug
+  const landingPages = pages.filter(page =>
+    (page.data.formId || page.data.contactLocation) && page.data.serviceSlug
+  );
+
+  return landingPages.map(page => {
+    const clientSlug = page.id.replace(/\.md$/, '').split('--')[0];
+    const client = clients.find(c => c.id === `${clientSlug}.yaml` || c.id === clientSlug);
+
+    // Hub is derived from formId (e.g. contact-form-fort-lauderdale -> fort-lauderdale)
+    const hubSlug = page.data.formId?.replace('contact-form-', '') || page.data.contactLocation;
+    const citySlug = page.data.locationSlug;
+
+    // URL priority: hub/city if both exist, otherwise just hub
+    const locationSlug = (citySlug && citySlug !== hubSlug)
+      ? `${hubSlug}/${citySlug}`
+      : hubSlug;
+
+    return {
+      params: { 
+        location: locationSlug,
+        service: page.data.serviceSlug
+      },
+      props: { page, client },
+    };
+  });
+}
+
+const { page, client } = Astro.props;
+const { data } = page;
+const cfg = client?.data;
+
+// Determine which sections render per template type
+const isQuote      = data.template === 'quote';
+const isHome       = data.template === 'home';
+const isService    = data.template === 'service' || isQuote;
+const isServiceSEO = data.template === 'service-seo';
+const isLocation   = data.template === 'location';
+const isAbout      = data.template === 'about';
+const isPPC        = (data.headerVariant || cfg.headerVariant) === 'ppc';
+
+// Resolve service areas (prefer page-level override if exists)
+const resolvedServiceAreas = data.serviceAreas || cfg.serviceAreas;
+
+// Resolve phone ─ priority: phoneId registry → deprecated phone field → client default
+const phoneEntry = data.phoneId ? PHONES.find(p => p.id === data.phoneId) : null;
+const pagePhone = phoneEntry?.number || data.phone || cfg.phone;
+
+// Resolve form ID ─ priority: formId registry → derived from deprecated contactLocation
+const formEntry = data.formId ? FORMS.find(f => f.id === data.formId) : null;
+const resolvedFormId = formEntry?.id
+  || (data.contactLocation ? `contact-form-${data.contactLocation}` : undefined);
+
+// ── Build Schema JSON-LD ──
+const schemaJSON = [];
+
+// 1. FAQ Schema
+if (data.faq && data.faq.length > 0) {
+  schemaJSON.push({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": data.faq.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.a
+      }
+    }))
+  });
+}
+
+// Extract town name for SEO and display
+// If nested (hub/city), we want the city part for the display name
+const rawLocation = data.locationSlug
+  || (data.formId?.replace('contact-form-', ''))
+  || data.contactLocation
+  || '';
+
+// Get the last segment if nested (e.g. 'fort-lauderdale/davie' -> 'davie')
+const cleanSlug = rawLocation.split('/').pop() || '';
+
+const townName = cleanSlug
+  ? cleanSlug.charAt(0).toUpperCase() + cleanSlug.slice(1).replace(/-/g, ' ')
+  : cfg?.city || 'Calgary';
+---
+
+<BaseLayout
+  title={data.metaTitle}
+  description={data.metaDescription}
+  ogImage={data.ogImage}
+  schema={data.schema}
+  client={{
+    businessName: cfg?.businessName || 'Your Company',
+    phone: pagePhone,
+    address: cfg?.address || '',
+    city: cfg?.city || '',
+    state: cfg?.state || 'FL',
+    colorPrimary: cfg?.colorPrimary || '#29b0e5',
+    colorPrimaryDark: cfg?.colorPrimaryDark || '#2d86c8',
+    colorAccent: cfg?.colorAccent || '#f68a1e',
+    siteUrl: cfg?.siteUrl || '',
+    schemaDescription: cfg?.schemaDescription || '',
+    yearFounded: cfg?.yearFounded || 2015,
+    googleRating: cfg?.googleRating || 4.9,
+    googleReviewCount: cfg?.googleReviewCount || 500,
+    gtmId: cfg?.gtmId,
+    recaptchaSiteKey: cfg?.recaptchaSiteKey,
+  }}
+  heroBg={data.heroBg}
+  pagePhone={pagePhone}
+  formId={resolvedFormId}
+>
+  <Fragment slot="head">
+    {schemaJSON.map(schema => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema, null, 2)} />
+    ))}
+  </Fragment>
+
+  <!-- ── Header ─────────────────────────────── -->
+  {(data.headerVariant || cfg.headerVariant) === 'ppc' ? (
+    <HeaderPPC
+      businessName={cfg.businessName}
+      phone={pagePhone}
+      navCTA={cfg.navCTA}
+      navCtaUrl={cfg.navCtaUrl}
+      logoSrc={cfg.logoSrc}
+    />
+  ) : (
+    <Header
+      businessName={cfg.businessName}
+      phone={pagePhone}
+      navCTA={cfg.navCTA}
+      navCtaUrl={cfg.navCtaUrl}
+      services={cfg.services}
+      address={cfg.address}
+      city={cfg.city}
+      state={cfg.state}
+      facebook={cfg.facebook}
+      instagram={cfg.instagram}
+      logoSrc={cfg.logoSrc}
+    />
+  )}
+
+  <!-- ── Hero ──────────────────────────────── -->
+  {data.heroTemplate === 'trust' && !isQuote && (
+    <HeroTrust
+      headline={data.heroHeadline}
+      subheadline={data.heroSubheadline}
+      bullets={data.heroBullets}
+      phone={pagePhone}
+      navCTA={cfg.navCTA}
+      navCtaUrl={cfg.navCtaUrl}
+      businessName={cfg.businessName}
+      townName={townName}
+      googleRating={cfg.googleRating}
+      googleReviewCount={cfg.googleReviewCount}
+      techCutout={cfg.techCutout}
+      heroReviews={cfg.heroReviews}
+      promoStamp={data.promoStamp}
+      couponExpiry={data.couponExpiry}
+      cornerSticker={data.cornerSticker}
+      heroEyebrow={cfg.heroEyebrow}
+      logoSrc={cfg.logoSrc}
+      heroBg={data.heroBg}
+      phoneFirst={data.heroPhoneFirst}
+      hideValueBar={data.heroHideValueBar}
+    />
+  )}
+
+  {isQuote && (
+    <MultiStepQuoteForm 
+      headline={data.heroHeadline}
+      subheadline={data.heroSubheadline}
+      logoSrc={cfg.logoSrc}
+    />
+  )}
+
+  <!-- ── Trust Bar (PPC only — replaces hero badge pills) ── -->
+  {data.heroPhoneFirst && !isQuote && (
+    <TrustBar
+      googleRating={cfg.googleRating}
+      googleReviewCount={cfg.googleReviewCount}
+      phone={pagePhone}
+      yearsInBusiness={cfg.yearFounded ? new Date().getFullYear() - cfg.yearFounded : 10}
+    />
+  )}
+
+  <!-- ── PPC Custom Section Order ───────────────── -->
+  {isPPC && !isQuote && (
+    <>
+      {/* 1. See Your Company in Action */}
+      {(cfg.videoId || cfg.videoEmbedUrl || cfg.videoSrc) && (
+        <CompanyVideo
+          videoId={cfg.videoId}
+          videoEmbedUrl={cfg.videoEmbedUrl}
+          videoSrc={cfg.videoSrc}
+          thumbnailUrl={cfg.videoThumbnail}
+          clientName={cfg.businessName}
+          stats={cfg.videoStats}
+        />
+      )}
+
+      {/* 2. Reviews */}
+      {cfg.googleReviews && cfg.googleReviews.length > 0 && (
+        <Reviews
+          heading={data.reviewsHeading || cfg.reviewsHeading}
+          rating={cfg.googleRating}
+          reviewCount={cfg.googleReviewCount}
+          reviews={cfg.googleReviews}
+        />
+      )}
+
+      {/* 3. What to Expect */}
+      <HowItWorks phone={pagePhone} />
+    </>
+  )}
+
+  <!-- ── Service Page Custom Sequence ────────── -->
+  {isService && !isHome && !isServiceSEO && (
+    <>
+      {/* Reviews only shown here on non-PPC — PPC gets them in the block above */}
+      {!isPPC && cfg.googleReviews && cfg.googleReviews.length > 0 && (
+        <Reviews
+          heading={data.reviewsHeading || cfg.reviewsHeading}
+          rating={cfg.googleRating}
+          reviewCount={cfg.googleReviewCount}
+          reviews={cfg.googleReviews}
+        />
+      )}
+
+      {isPPC ? (
+        <>
+          {data.split && data.split.length > 0 && (
+            <FiftyFifty blocks={[data.split[0]]} phone={pagePhone} clientName={cfg.businessName} />
+          )}
+
+          {data.split && data.split.length > 1 && (
+            <FiftyFifty blocks={data.split.slice(1)} phone={pagePhone} clientName={cfg.businessName} startIndex={1} />
+          )}
+
+          {data.pricingFactors && data.pricingFactors.length > 0 && (
+            <CostPricing 
+              heading={data.pricingHeading}
+              factors={data.pricingFactors}
+            />
+          )}
+
+          {data.symptoms && data.symptoms.length > 0 && (
+            <SymptomsGrid
+              heading={data.symptomsHeading || 'Common Warning Signs'}
+              subheading={data.symptomsSubheading}
+              symptoms={data.symptoms}
+              phone={pagePhone}
+              servicePreset={data.ctaFormServicePreset || 'AC Repair'}
+              formId={resolvedFormId}
+            />
+          )}
+
+          {data.recentActivity && data.recentActivity.length > 0 && (
+            <RecentServiceActivity 
+              heading={data.recentActivityHeading}
+              activities={data.recentActivity}
+            />
+          )}
+        </>
+      ) : (
+        <AirflowParticles>
+          {data.split && data.split.length > 0 && (
+            <FiftyFifty blocks={[data.split[0]]} phone={pagePhone} clientName={cfg.businessName} />
+          )}
+
+          {!data.qualifyForm && (
+            <FiftyFiftyForm phone={pagePhone} formId={resolvedFormId} />
+          )}
+
+          {data.split && data.split.length > 1 && (
+            <FiftyFifty blocks={data.split.slice(1)} phone={pagePhone} clientName={cfg.businessName} startIndex={1} />
+          )}
+
+          {data.pricingFactors && data.pricingFactors.length > 0 && (
+            <CostPricing 
+              heading={data.pricingHeading}
+              factors={data.pricingFactors}
+            />
+          )}
+
+          {data.symptoms && data.symptoms.length > 0 && (
+            <SymptomsGrid
+              heading={data.symptomsHeading || 'Common Warning Signs'}
+              subheading={data.symptomsSubheading}
+              symptoms={data.symptoms}
+              phone={pagePhone}
+              servicePreset={data.ctaFormServicePreset || 'AC Repair'}
+              formId={resolvedFormId}
+            />
+          )}
+        </AirflowParticles>
+      )}
+
+      {/* Meet the Team — after content modules */}
+      {cfg.team && cfg.team.length > 0 && (
+        <TeamSpotlight team={cfg.team} logoSrc={cfg.logoSrc} associations={cfg.associations} />
+      )}
+    </>
+  )}
+
+  <!-- ── FAQ (Global Fallback) ──────────────── -->
+  {!isServiceSEO && data.faq && data.faq.length > 0 && (
+    <section class="faq-section section" id="faq">
+      <div class="container">
+        <div class="faq-header">
+          <span class="eyebrow">Common Questions</span>
+          <h2 class="heading-lg">Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-list">
+          {data.faq.map((item, i) => (
+            <details class="faq-item reveal" style={`transition-delay: ${i * 60}ms`}>
+              <summary class="faq-q">{item.q}</summary>
+              <p class="faq-a">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ── CTA Band / Bottom Form ─────────────── -->
+  {(data.headerVariant || cfg.headerVariant) === 'ppc' ? (
+    <FiftyFiftyForm
+      eyebrow="Fast & Reliable"
+      headline={data.ctaFormHeadline || data.ctaHeading || cfg.ctaHeading}
+      body={data.ctaSubheading || cfg.ctaSubheading}
+      features={data.ctaFormFeatures}
+      phone={pagePhone}
+      simpleMode={data.ctaFormSimple}
+      servicePreset={data.ctaFormServicePreset}
+      formId={resolvedFormId}
+    />
+  ) : (
+    <CTA
+      heading={data.ctaHeading || cfg.ctaHeading}
+      subheading={data.ctaSubheading || cfg.ctaSubheading}
+      phone={pagePhone}
+      navCTA={cfg.navCTA}
+      navCtaUrl={cfg.navCtaUrl}
+      clientName={cfg.businessName}
+      townName={townName}
+      truckSrc={cfg.truckSrc}
+      logoSrc={cfg.logoSrc}
+    />
+  )}
+
+  <!-- ── Footer ─────────────────────────────── -->
+  {cfg.footerVariant === 'ppc' ? (
+    <FooterPPC
+      businessName={cfg.businessName}
+      phone={pagePhone}
+      address={cfg.address}
+      city={cfg.city}
+      state={cfg.state}
+      zip={cfg.zip}
+    />
+  ) : (
+    <Footer
+      businessName={cfg.businessName}
+      phone={pagePhone}
+      address={cfg.address}
+      city={cfg.city}
+      state={cfg.state}
+      zip={cfg.zip}
+      email={cfg.email}
+      facebook={cfg.facebook}
+      instagram={cfg.instagram}
+      services={cfg.services}
+      serviceAreas={cfg.serviceAreas}
+      siteUrl={cfg.siteUrl}
+    />
+  )}
+</BaseLayout>
+
+<style>
+/* Same styles as [page].astro or global */
+.faq-section { background: var(--color-surface); }
+.faq-header { text-align: center; margin-bottom: 48px; }
+.faq-header .eyebrow { display: block; margin-bottom: 12px; }
+.faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+.faq-item {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition-base);
+}
+.faq-item[open] { border-color: var(--color-primary); }
+.faq-item[open] .faq-q::after { transform: rotate(180deg); }
+
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 24px;
+  font-family: var(--font-heading);
+  font-size: 1rem; font-weight: 700;
+  cursor: pointer; list-style: none; color: var(--color-text);
+}
+.faq-q::-webkit-details-marker { display: none; }
+.faq-q::after {
+  content: '↓'; font-size: 0.9rem; color: var(--color-primary);
+  transition: transform var(--transition-base); flex-shrink: 0;
+}
+.faq-a {
+  padding: 0 24px 20px;
+  color: var(--color-text-muted); line-height: 1.75; font-size: 0.95rem;
+}
+</style>

@@ -1,0 +1,250 @@
+---
+interface Props {
+  heading?: string;
+  steps: {
+    title: string;
+    description: string;
+  }[];
+  logoSrc?: string;
+}
+
+const {
+  heading = "What Happens When You Call?",
+  steps = [],
+  logoSrc
+} = Astro.props;
+---
+
+{steps.length > 0 && (
+  <section class="pt-section section glass-reveal" id="process-timeline">
+    {logoSrc && (
+      <div class="pt-watermark" aria-hidden="true">
+        <img src={logoSrc} alt="" class="pt-watermark-img" />
+      </div>
+    )}
+
+    <div class="container relative-z">
+      <div class="pt-header">
+        <span class="eyebrow">Seamless Service</span>
+        <h2 class="heading-lg">{heading}</h2>
+        <p class="pt-subtitle">We've eliminated the stress from home services. From the moment you pick up the phone to the final handshake, here is exactly what to expect.</p>
+      </div>
+
+      <div class="pt-timeline">
+        {steps.map((step, i) => (
+          <div class="pt-step reveal" style={`transition-delay: ${i * 150}ms`}>
+            {/* The vertical connector line - Animated Flow */}
+            {i !== steps.length - 1 && <div class="pt-line"><div class="pt-line-flow"></div></div>}
+            
+            <div class="pt-marker">
+              <span class="pt-num">{i + 1}</span>
+              <div class="pt-marker-pulse"></div>
+            </div>
+            
+            <div class="pt-content">
+              <h3 class="pt-title">{step.title}</h3>
+              <p class="pt-desc">{step.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Wavy bottom edge -->
+    <div class="pt-wave-bottom" aria-hidden="true">
+      <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,20 C120,60 240,0 360,30 C480,60 600,10 720,35 C840,60 960,5 1080,30 C1200,55 1320,10 1440,25 L1440,80 L0,80 Z" fill="var(--color-bg, #ffffff)" />
+      </svg>
+    </div>
+  </section>
+)}
+
+<style>
+.pt-section {
+  padding: 110px 24px 140px;
+  background: linear-gradient(135deg,
+    rgba(20, 60, 100, 0.98) 0%,
+    rgba(41, 176, 229, 0.90) 60%,
+    rgba(45, 134, 200, 0.95) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Wavy bottom divider */
+.pt-wave-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+  line-height: 0;
+}
+.pt-wave-bottom svg {
+  display: block;
+  width: 100%;
+  height: 80px;
+}
+
+/* ── Branding Watermark ── */
+.pt-watermark {
+  position: absolute;
+  top: 50%;
+  right: -5%;
+  transform: translateY(-50%);
+  width: 600px;
+  height: 600px;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
+}
+.pt-watermark-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(1) brightness(200%);
+}
+
+.relative-z { position: relative; z-index: 2; }
+
+.pt-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 60px;
+}
+.pt-header .heading-lg {
+  color: #ffffff;
+}
+.pt-subtitle {
+  margin-top: 16px;
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+}
+
+.pt-timeline {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.pt-step {
+  display: flex;
+  position: relative;
+  padding-bottom: 56px;
+}
+.pt-step:last-child {
+  padding-bottom: 0;
+}
+
+/* ── Animated Flowing Pipeline ── */
+.pt-line {
+  position: absolute;
+  left: 32px; /* middle of 64px marker */
+  top: 64px;
+  bottom: 0;
+  width: 3px;
+  background: rgba(255, 255, 255, 0.15); /* Track path */
+  transform: translateX(-50%);
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 999px;
+}
+.pt-line-flow {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, var(--color-accent, #f68a1e), transparent);
+  animation: flow-down 3s ease-in-out infinite;
+}
+@keyframes flow-down {
+  0% { top: -100%; }
+  100% { top: 100%; }
+}
+
+/* ── Branded Node Markers ── */
+.pt-marker {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-primary-dark, #0f172a);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  margin-right: 36px;
+  border: 4px solid #fff;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.pt-marker-pulse {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary-dark);
+  opacity: 0;
+  transform: scale(1);
+  transition: all 0.4s ease;
+}
+.pt-num {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--color-accent, #f68a1e);
+  transition: color 0.3s ease;
+}
+
+.pt-content {
+  padding-top: 14px;
+}
+
+.pt-title {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  color: #ffffff;
+  margin-bottom: 12px;
+  transition: color 0.3s ease;
+}
+
+.pt-desc {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 650px;
+}
+
+/* ── Interactive Brand States ── */
+.pt-step:hover .pt-marker {
+  transform: scale(1.1);
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.4);
+}
+.pt-step:hover .pt-marker-pulse {
+  animation: marker-pulse-anim 1.5s infinite running;
+}
+.pt-step:hover .pt-title {
+  color: var(--color-accent, #f68a1e);
+}
+@keyframes marker-pulse-anim {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+  .pt-watermark { width: 300px; height: 300px; opacity: 0.02; right: -20px; }
+  .pt-marker {
+    width: 52px; height: 52px;
+    margin-right: 24px;
+  }
+  .pt-line { left: 26px; top: 52px; }
+  .pt-title { font-size: 1.35rem; }
+  .pt-desc { font-size: 0.95rem; line-height: 1.6; }
+  .pt-content { padding-top: 8px; }
+  .pt-step { padding-bottom: 40px; }
+}
+</style>

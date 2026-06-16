@@ -1,0 +1,964 @@
+---
+// src/pages/[page].astro
+// Dynamic route — generates every Your Company page at /{page-slug}
+
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import HeaderPPC from '../components/HeaderPPC.astro';
+import Footer from '../components/Footer.astro';
+import FooterPPC from '../components/FooterPPC.astro';
+import HeroTrust from '../components/HeroTrust.astro';
+import FiftyFifty from '../components/FiftyFifty.astro';
+import FiftyFiftyForm from '../components/FiftyFiftyForm.astro';
+import ServicesCategorizedSplit from '../components/ServicesCategorizedSplit.astro';
+import ServiceArea from '../components/ServiceArea.astro';
+import Reviews from '../components/Reviews.astro';
+import CTA from '../components/CTA.astro';
+import SectionDivider from '../components/SectionDivider.astro';
+import AirflowParticles from '../components/AirflowParticles.astro';
+import QualifyForm from '../components/QualifyForm.astro';
+import DealerLogos from '../components/DealerLogos.astro';
+import ServiceContent from '../components/ServiceContent.astro';
+import TeamSpotlight from '../components/TeamSpotlight.astro';
+import SymptomsGrid from '../components/SymptomsGrid.astro';
+import ServiceAreaMap from '../components/ServiceAreaMap.astro';
+import CompanyVideo from '../components/CompanyVideo.astro';
+import RecentServiceActivity from '../components/RecentServiceActivity.astro';
+import CostPricing from '../components/CostPricing.astro';
+import ProcessTimeline from '../components/ProcessTimeline.astro';
+import MultiStepQuoteForm from '../components/MultiStepQuoteForm.astro';
+import TrustBar from '../components/TrustBar.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import { FORMS, PHONES } from '../content/formRegistry';
+
+export async function getStaticPaths() {
+  const allPages = await getCollection('pages');
+  const clients = await getCollection('clients');
+
+  // Filter out pages that have a serviceSlug (those are handled by [location]/[service].astro)
+  const pages = allPages.filter(page => !page.data.serviceSlug);
+
+  return pages.map(page => {
+    // Filename format: american-home-pros--home  (client--page)
+    const parts = page.id.replace(/\.md$/, '').split('--');
+    const clientSlug = parts[0];
+    const pageSlug   = parts[1] || 'home';
+
+    const client = clients.find(c => c.id === `${clientSlug}.yaml` || c.id === clientSlug);
+    return {
+      params: { page: pageSlug },
+      props: { page, client },
+    };
+  });
+}
+
+const { page, client } = Astro.props;
+const { data } = page;
+const cfg = client?.data;
+
+// Determine which sections render per template type
+const isQuote      = data.template === 'quote';
+const isHome       = data.template === 'home';
+const isService    = data.template === 'service' || isQuote;
+const isServiceSEO = data.template === 'service-seo';
+const isLocation   = data.template === 'location';
+const isServicePPC = data.template === 'service-ppc';
+const isAbout      = data.template === 'about';
+const isPPC        = (data.headerVariant || cfg.headerVariant) === 'ppc';
+
+// Resolve service areas (prefer page-level override if exists)
+const resolvedServiceAreas = data.serviceAreas || cfg.serviceAreas;
+
+// Resolve phone ─ priority: phoneId registry → deprecated phone field → client default
+const phoneEntry = data.phoneId ? PHONES.find(p => p.id === data.phoneId) : null;
+const pagePhone = phoneEntry?.number || data.phone || cfg.phone;
+
+// Resolve form ID ─ priority: formId registry → derived from deprecated contactLocation → fallback
+const formEntry = data.formId ? FORMS.find(f => f.id === data.formId) : null;
+const resolvedFormId = formEntry?.id
+  || (data.contactLocation ? `contact-form-${data.contactLocation}` : undefined);
+
+// ── Build Schema JSON-LD ──
+const schemaJSON = [];
+
+// 1. FAQ Schema
+if (data.faq && data.faq.length > 0) {
+  schemaJSON.push({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": data.faq.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.a
+      }
+    }))
+  });
+}
+
+// 2. Video Schema
+if (cfg.videoId || cfg.videoEmbedUrl || cfg.videoSrc) {
+  schemaJSON.push({
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": `${cfg.businessName} - Company Overview`,
+    "description": `Learn more about ${cfg.businessName} and our commitment to serving ${cfg.city}, ${cfg.state}.`,
+    "thumbnailUrl": cfg.videoThumbnail || `${cfg.siteUrl}/_assets/og-image.jpg`,
+    "uploadDate": new Date().toISOString().split('T')[0],
+    "contentUrl": cfg.videoSrc || (cfg.videoId ? `https://www.youtube.com/watch?v=${cfg.videoId}` : cfg.videoEmbedUrl)
+  });
+}
+
+// 3. Service Schema
+if (isServiceSEO) {
+  schemaJSON.push({
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": data.serviceName || data.metaTitle,
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": cfg.businessName
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": cfg.city
+    }
+  });
+}
+
+// Extract the town name for SEO alt tags. If the slug includes a town (e.g., heat-pump-installation-leominster),
+// we attempt to pop it off the end. Otherwise we default to the client's primary city.
+const slugParts = page.id.replace(/\.md$/, '').split('--')[1]?.split('-') || [];
+const townName = (isLocation || isService || isServiceSEO) && slugParts.length > 0
+  ? slugParts[slugParts.length - 1].charAt(0).toUpperCase() + slugParts[slugParts.length - 1].slice(1)
+  : cfg.city || 'Calgary';
+---
+
+<BaseLayout
+  title={data.metaTitle}
+  description={data.metaDescription}
+  ogImage={data.ogImage}
+  schema={data.schema}
+  client={{
+    businessName: cfg.businessName,
+    phone: pagePhone,
+    address: cfg.address,
+    city: cfg.city,
+    state: cfg.state,
+    colorPrimary: cfg.colorPrimary,
+    colorPrimaryDark: cfg.colorPrimaryDark,
+    colorAccent: cfg.colorAccent,
+    siteUrl: cfg.siteUrl,
+    schemaDescription: cfg.schemaDescription,
+    yearFounded: cfg.yearFounded,
+    googleRating: cfg.googleRating,
+    googleReviewCount: cfg.googleReviewCount,
+    gtmId: cfg.gtmId,
+    recaptchaSiteKey: cfg.recaptchaSiteKey,
+  }}
+  heroBg={data.heroBg}
+  pagePhone={pagePhone}
+  formId={resolvedFormId}
+>
+  <Fragment slot="head">
+    {schemaJSON.map(schema => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema, null, 2)} />
+    ))}
+  </Fragment>
+
+  <!-- ── Header ─────────────────────────────── -->
+  {(data.headerVariant || cfg.headerVariant) === 'ppc' ? (
+    <HeaderPPC
+      businessName={cfg.businessName}
+      phone={pagePhone}
+      navCTA={cfg.navCTA}
+      navCtaUrl={cfg.navCtaUrl}
+      logoSrc={cfg.logoSrc}
+    />
+  ) : (
+    <Header
+      businessName={cfg.businessName}
+      phone={pagePhone}
+      navCTA={cfg.navCTA}
+      navCtaUrl={cfg.navCtaUrl}
+      services={cfg.services}
+      address={cfg.address}
+      city={cfg.city}
+      state={cfg.state}
+      facebook={cfg.facebook}
+      instagram={cfg.instagram}
+      logoSrc={cfg.logoSrc}
+    />
+  )}
+
+  <!-- ── Hero ──────────────────────────────── -->
+  {data.heroTemplate === 'trust' && !isQuote && (
+    <HeroTrust
+      headline={data.heroHeadline}
+      subheadline={data.heroSubheadline}
+      bullets={data.heroBullets}
+      phone={pagePhone}
+      navCTA={cfg.navCTA}
+      navCtaUrl={cfg.navCtaUrl}
+      businessName={cfg.businessName}
+      townName={townName}
+      googleRating={cfg.googleRating}
+      googleReviewCount={cfg.googleReviewCount}
+      techCutout={cfg.techCutout}
+      heroReviews={cfg.heroReviews}
+      promoStamp={data.promoStamp}
+      couponExpiry={data.couponExpiry}
+      cornerSticker={data.cornerSticker}
+      heroEyebrow={cfg.heroEyebrow}
+      logoSrc={cfg.logoSrc}
+      heroBg={data.heroBg}
+      phoneFirst={data.heroPhoneFirst}
+      hideValueBar={data.heroHideValueBar}
+    />
+  )}
+
+  {isQuote && (
+    <MultiStepQuoteForm 
+      headline={data.heroHeadline}
+      subheadline={data.heroSubheadline}
+      logoSrc={cfg.logoSrc}
+    />
+  )}
+
+
+  <!-- ── Trust Bar (PPC only — replaces hero badge pills) ── -->
+  {data.heroPhoneFirst && !isQuote && (
+    <TrustBar
+      googleRating={cfg.googleRating}
+      googleReviewCount={cfg.googleReviewCount}
+      phone={pagePhone}
+      yearsInBusiness={cfg.yearFounded ? new Date().getFullYear() - cfg.yearFounded : 10}
+    />
+  )}
+
+  <!-- ── PPC Service-Expanded Template Sequence ───────────────── -->
+  {isServicePPC && (
+    <>
+      {(cfg.videoId || cfg.videoEmbedUrl || cfg.videoSrc) && (
+        <CompanyVideo
+          videoId={cfg.videoId}
+          videoEmbedUrl={cfg.videoEmbedUrl}
+          videoSrc={cfg.videoSrc}
+          thumbnailUrl={cfg.videoThumbnail}
+          clientName={cfg.businessName}
+          stats={cfg.videoStats}
+          compact={!!cfg.videoCompact}
+        />
+      )}
+
+      {cfg.googleReviews && cfg.googleReviews.length > 0 && (
+        <Reviews
+          heading={data.reviewsHeading || cfg.reviewsHeading}
+          rating={cfg.googleRating}
+          reviewCount={cfg.googleReviewCount}
+          reviews={cfg.googleReviews}
+        />
+      )}
+
+      <FiftyFiftyForm
+        eyebrow="Fast & Reliable"
+        headline={data.ctaFormHeadline || data.ctaHeading || cfg.ctaHeading}
+        body={data.ctaSubheading || cfg.ctaSubheading}
+        features={data.ctaFormFeatures}
+        phone={pagePhone}
+        simpleMode={data.ctaFormSimple}
+        servicePreset={data.ctaFormServicePreset}
+        formId={resolvedFormId}
+      />
+
+      <HowItWorks
+        phone={pagePhone}
+        heading={data.howItWorksHeading}
+        eyebrow={data.howItWorksEyebrow}
+        steps={data.howItWorksSteps}
+        ctaUrl="#cta-section"
+        ctaLabel="See If You Qualify"
+      />
+
+      {data.split && data.split.length > 0 && (
+        <FiftyFifty blocks={[data.split[0]]} phone={pagePhone} clientName={cfg.businessName} />
+      )}
+
+      {data.split && data.split.length > 1 && (
+        <FiftyFifty blocks={data.split.slice(1)} phone={pagePhone} clientName={cfg.businessName} startIndex={1} />
+      )}
+
+      {data.pricingFactors && data.pricingFactors.length > 0 && (
+        <CostPricing 
+          heading={data.pricingHeading}
+          factors={data.pricingFactors}
+        />
+      )}
+
+      {data.symptoms && data.symptoms.length > 0 && (
+        <SymptomsGrid
+          heading={data.symptomsHeading || 'Common Warning Signs'}
+          subheading={data.symptomsSubheading}
+          symptoms={data.symptoms}
+          phone={pagePhone}
+          servicePreset={data.ctaFormServicePreset || 'AC Repair'}
+          formId={resolvedFormId}
+        />
+      )}
+
+      {data.recentActivity && data.recentActivity.length > 0 && (
+        <RecentServiceActivity 
+          heading={data.recentActivityHeading}
+          activities={data.recentActivity}
+        />
+      )}
+    </>
+  )}
+
+
+  <!-- ── PPC Custom Section Order ───────────────── -->
+  {isPPC && !isQuote && !isServicePPC && (
+    <>
+      {/* 1. See Your Company in Action */}
+      {(cfg.videoId || cfg.videoEmbedUrl || cfg.videoSrc) && (
+        <CompanyVideo
+          videoId={cfg.videoId}
+          videoEmbedUrl={cfg.videoEmbedUrl}
+          videoSrc={cfg.videoSrc}
+          thumbnailUrl={cfg.videoThumbnail}
+          clientName={cfg.businessName}
+          stats={cfg.videoStats}
+        />
+      )}
+
+      {/* 2. Reviews */}
+      <Reviews
+        heading={data.reviewsHeading || cfg.reviewsHeading}
+        rating={cfg.googleRating}
+        reviewCount={cfg.googleReviewCount}
+        reviews={cfg.googleReviews}
+      />
+
+      {/* 3. What to Expect */}
+      <HowItWorks phone={pagePhone} />
+    </>
+  )}
+
+  <!-- ── Home Page Custom Sequence ────────── -->
+  {isHome && (
+    <>
+      <SectionDivider variant="airflow" />
+      
+      {cfg.dealerLogos && cfg.dealerLogos.length > 0 && (
+        <DealerLogos logos={cfg.dealerLogos} exclude={data.excludeDealerLogos} />
+      )}
+      
+      <ServiceArea
+        areas={cfg.serviceAreas}
+        state={cfg.state}
+        clientName={cfg.businessName}
+        townName={cfg.city}
+        phone={pagePhone}
+        truckSrc={cfg.truckSrc}
+        mapEmbedUrl={cfg.mapEmbedUrl}
+      />
+      
+      <SectionDivider variant="wave" clientName={cfg.businessName} townName={cfg.city} />
+
+      {cfg.team && cfg.team.length > 0 && (
+        <TeamSpotlight team={cfg.team} logoSrc={cfg.logoSrc} associations={cfg.associations} />
+      )}
+
+      {data.split && data.split.length > 0 && (
+        <FiftyFifty blocks={[data.split[0]]} phone={pagePhone} clientName={cfg.businessName} />
+      )}
+
+      <SectionDivider variant="airflow" />
+
+      {cfg.googleReviews && cfg.googleReviews.length > 0 && (
+        <Reviews
+          heading={data.reviewsHeading || cfg.reviewsHeading}
+          rating={cfg.googleRating}
+          reviewCount={cfg.googleReviewCount}
+          reviews={cfg.googleReviews}
+        />
+      )}
+
+      {data.split && data.split.length > 1 && (
+        <FiftyFifty blocks={[data.split[1]]} phone={pagePhone} clientName={cfg.businessName} />
+      )}
+    </>
+  )}
+
+  <!-- ── Divider: airflow after hero (Except Home + PPC) ─────── -->
+  {!isHome && !isPPC && <SectionDivider variant="airflow" />}
+
+  <!-- ── Dealer Logos (Global except SEO template top, Home & PPC) ── -->
+  {!isServicePPC && !isServiceSEO && !isHome && !isPPC && cfg.dealerLogos && cfg.dealerLogos.length > 0 && (
+    <DealerLogos logos={cfg.dealerLogos} exclude={data.excludeDealerLogos} />
+  )}
+
+  <!-- ── Service SEO Template ──────────────── -->
+  {isServiceSEO && (
+    <>
+      {cfg.team && cfg.team.length > 0 && (
+        <TeamSpotlight team={cfg.team} logoSrc={cfg.logoSrc} associations={cfg.associations} />
+      )}
+
+      {/* Add the very first 50/50 module above the 70/30 per user request */}
+      {data.split && data.split.length > 0 && (
+        <FiftyFifty blocks={[data.split[0]]} phone={pagePhone} clientName={cfg.businessName} />
+      )}
+
+      {/* 70/30 long-form article + sticky form */}
+      <ServiceContent
+        content={data.longFormContent}
+        serviceName={data.serviceName || 'AC Repair'}
+        cityName={cfg.city}
+        stateName={cfg.state}
+        phone={pagePhone}
+        couponTitle={data.couponTitle}
+        couponExpiry={data.couponExpiry}
+        siteUrl={cfg.siteUrl}
+        author={data.author}
+        reviewer={data.reviewer}
+      />
+
+      {/* Pricing / Cost Module */}
+      {data.pricingFactors && data.pricingFactors.length > 0 && (
+        <CostPricing 
+          heading={data.pricingHeading}
+          factors={data.pricingFactors}
+        />
+      )}
+
+      {/* Company video */}
+      {(cfg.videoId || cfg.videoEmbedUrl || cfg.videoSrc) && (
+        <CompanyVideo
+          videoId={cfg.videoId}
+          videoEmbedUrl={cfg.videoEmbedUrl}
+          videoSrc={cfg.videoSrc}
+          thumbnailUrl={cfg.videoThumbnail}
+          clientName={cfg.businessName}
+          stats={cfg.videoStats}
+        />
+      )}
+
+      {/* FAQ */}
+      {data.faq && data.faq.length > 0 && (
+        <section class="faq-section section" id="faq">
+          <div class="container">
+            <div class="faq-header">
+              <span class="eyebrow">Common Questions</span>
+              <h2 class="heading-lg">Frequently Asked Questions</h2>
+            </div>
+            <div class="faq-list">
+              {data.faq.map((item: any, i: number) => (
+                <details class="faq-item reveal" style={`transition-delay: ${i * 60}ms`}>
+                  <summary class="faq-q">{item.q}</summary>
+                  <p class="faq-a">{item.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Symptoms SEO grid */}
+      {data.symptoms && data.symptoms.length > 0 && (
+        <SymptomsGrid
+          heading={data.symptomsHeading || 'Common Warning Signs'}
+          subheading={data.symptomsSubheading}
+          symptoms={data.symptoms}
+          phone={pagePhone}
+          servicePreset={data.ctaFormServicePreset || 'AC Repair'}
+          formId={resolvedFormId}
+        />
+      )}
+
+      {/* Recent Activity Grid */}
+      {data.recentActivity && data.recentActivity.length > 0 && (
+        <RecentServiceActivity 
+          heading={data.recentActivityHeading}
+          activities={data.recentActivity}
+        />
+      )}
+
+      {/* Remaining 50/50 content blocks */}
+      {data.split && data.split.length > 1 && (
+        <FiftyFifty blocks={data.split.slice(1)} phone={pagePhone} clientName={cfg.businessName} startIndex={1} />
+      )}
+
+      {/* Process Timeline */}
+      {data.processSteps && data.processSteps.length > 0 && (
+        <ProcessTimeline
+          heading={data.processHeading}
+          steps={data.processSteps}
+          logoSrc={cfg.logoSrc}
+        />
+      )}
+
+      <SectionDivider variant="airflow" />
+
+      {cfg.googleReviews && cfg.googleReviews.length > 0 && (
+        <Reviews
+          heading={data.reviewsHeading || cfg.reviewsHeading}
+          rating={cfg.googleRating}
+          reviewCount={cfg.googleReviewCount}
+          reviews={cfg.googleReviews}
+        />
+      )}
+
+      <ServiceAreaMap
+        areas={resolvedServiceAreas?.flatMap((a: any) => typeof a === 'string' ? a : a.towns) ?? []}
+        clientName={cfg.businessName}
+        townName={cfg.city}
+        phone={pagePhone}
+        mapEmbedUrl={cfg.mapEmbedUrl}
+      />
+
+      {data.showServiceArea && (
+        <ServiceArea
+          areas={cfg.serviceAreas}
+          state={cfg.state}
+          clientName={cfg.businessName}
+          townName={cfg.city}
+          phone={pagePhone}
+          truckSrc={cfg.truckSrc}
+          mapEmbedUrl={cfg.mapEmbedUrl}
+        />
+      )}
+
+      <SectionDivider variant="wave" clientName={cfg.businessName} townName={cfg.city} />
+
+      {/* Put equipment logos at the bottom so they don't clash visually with associations at the top */}
+      {cfg.dealerLogos && <DealerLogos logos={cfg.dealerLogos} exclude={data.excludeDealerLogos} />}
+    </>
+  )}
+
+  <!-- ── Service Page Custom Sequence ────────── -->
+  {isService && !isHome && !isServiceSEO && (
+    <>
+      {/* Reviews only shown here on non-PPC — PPC gets them in the block above */}
+      {!isPPC && cfg.googleReviews && cfg.googleReviews.length > 0 && (
+        <Reviews
+          heading={data.reviewsHeading || cfg.reviewsHeading}
+          rating={cfg.googleRating}
+          reviewCount={cfg.googleReviewCount}
+          reviews={cfg.googleReviews}
+        />
+      )}
+
+      {/* Wrap in AirflowParticles only for non-PPC pages */}
+      {isPPC ? (
+        <>
+          {data.split && data.split.length > 0 && (
+            <FiftyFifty blocks={[data.split[0]]} phone={pagePhone} clientName={cfg.businessName} />
+          )}
+
+          {data.split && data.split.length > 1 && (
+            <FiftyFifty blocks={data.split.slice(1)} phone={pagePhone} clientName={cfg.businessName} startIndex={1} />
+          )}
+
+          {data.pricingFactors && data.pricingFactors.length > 0 && (
+            <CostPricing 
+              heading={data.pricingHeading}
+              factors={data.pricingFactors}
+            />
+          )}
+
+          {data.symptoms && data.symptoms.length > 0 && (
+            <SymptomsGrid
+              heading={data.symptomsHeading || 'Common Warning Signs'}
+              subheading={data.symptomsSubheading}
+              symptoms={data.symptoms}
+              phone={pagePhone}
+              servicePreset={data.ctaFormServicePreset || 'AC Repair'}
+              formId={resolvedFormId}
+            />
+          )}
+
+          {data.recentActivity && data.recentActivity.length > 0 && (
+            <RecentServiceActivity 
+              heading={data.recentActivityHeading}
+              activities={data.recentActivity}
+            />
+          )}
+        </>
+      ) : (
+        <AirflowParticles>
+          {data.split && data.split.length > 0 && (
+            <FiftyFifty blocks={[data.split[0]]} phone={pagePhone} clientName={cfg.businessName} />
+          )}
+
+          {!data.qualifyForm && (
+            <FiftyFiftyForm phone={pagePhone} formId={resolvedFormId} />
+          )}
+
+          {data.split && data.split.length > 1 && (
+            <FiftyFifty blocks={data.split.slice(1)} phone={pagePhone} clientName={cfg.businessName} startIndex={1} />
+          )}
+
+          {(cfg.videoId || cfg.videoEmbedUrl || cfg.videoSrc) && (
+            <CompanyVideo
+              videoId={cfg.videoId}
+              videoEmbedUrl={cfg.videoEmbedUrl}
+              videoSrc={cfg.videoSrc}
+              thumbnailUrl={cfg.videoThumbnail}
+              clientName={cfg.businessName}
+              stats={cfg.videoStats}
+            />
+          )}
+
+          {data.pricingFactors && data.pricingFactors.length > 0 && (
+            <CostPricing 
+              heading={data.pricingHeading}
+              factors={data.pricingFactors}
+            />
+          )}
+
+          {data.symptoms && data.symptoms.length > 0 && (
+            <SymptomsGrid
+              heading={data.symptomsHeading || 'Common Warning Signs'}
+              subheading={data.symptomsSubheading}
+              symptoms={data.symptoms}
+              phone={pagePhone}
+              servicePreset={data.ctaFormServicePreset || 'AC Repair'}
+              formId={resolvedFormId}
+            />
+          )}
+
+          {data.recentActivity && data.recentActivity.length > 0 && (
+            <RecentServiceActivity 
+              heading={data.recentActivityHeading}
+              activities={data.recentActivity}
+            />
+          )}
+        </AirflowParticles>
+      )}
+
+      {/* Meet the Team — after content modules */}
+      {cfg.team && cfg.team.length > 0 && (
+        <TeamSpotlight team={cfg.team} logoSrc={cfg.logoSrc} associations={cfg.associations} />
+      )}
+
+      {/* Wave divider only on non-PPC */}
+      {!isPPC && <SectionDivider variant="wave" clientName={cfg.businessName} townName={townName} />}
+    </>
+  )}
+
+
+  <!-- ── Services Categories (location) ───── -->
+  {isLocation && !isHome && (
+    <>
+      <ServicesCategorizedSplit
+        eyebrow={cfg.servicesEyebrow}
+        heading={data.servicesHeading || cfg.servicesHeading}
+      />
+      <SectionDivider variant="wave" clientName={cfg.businessName} townName={townName} />
+    </>
+  )}
+
+  <!-- ── 50/50 Block Orchestration (Fallback for other templates) ───────────── -->
+  {(!isServicePPC && !isServiceSEO && !isHome && !isService && data.split && data.split.length > 0) && (
+    <AirflowParticles>
+      <FiftyFifty blocks={data.split} phone={pagePhone} clientName={cfg.businessName} />
+    </AirflowParticles>
+  )}
+
+  <!-- ── Team Spotlight (Non-Service) ────────── -->
+  {/* Handled explicitly in Home logic now */}
+
+  <!-- ── Company Video (Home) ───────────────── -->
+  {/* Removed from global Home logic per recent changes, mapped locally if needed */}
+
+  <!-- ── Qualify Form (rebate pages) ───────── -->
+  {data.qualifyForm && !isHome && <QualifyForm phone={pagePhone} />}
+
+  <!-- ── Divider: airflow ────────────────── -->
+  {(!isServicePPC && !isService && !isServiceSEO && !isHome) && <SectionDivider variant="airflow" />}
+
+
+  <!-- ── Reviews (Non-Service) ───────────────── -->
+  {(!isServicePPC && !isService && !isServiceSEO && !isHome) && cfg.googleReviews && cfg.googleReviews.length > 0 && (
+    <Reviews
+      heading={data.reviewsHeading || cfg.reviewsHeading}
+      rating={cfg.googleRating}
+      reviewCount={cfg.googleReviewCount}
+      reviews={cfg.googleReviews}
+    />
+  )}
+
+  <!-- ── Divider: airflow ───────────────── -->
+  {(!isServicePPC && !isServiceSEO && !isHome && !isPPC && (isLocation || isService)) && <SectionDivider variant="airflow" />}
+
+  <!-- ── Service Area (home + location + flagged pages) ── -->
+  {(!isServiceSEO && !isHome && (isLocation || data.showServiceArea)) && (
+    <ServiceAreaMap
+      areas={resolvedServiceAreas?.flatMap((a: any) => typeof a === 'string' ? a : a.towns) ?? []}
+      clientName={cfg.businessName}
+      townName={townName}
+      phone={pagePhone}
+      mapEmbedUrl={cfg.mapEmbedUrl}
+    />
+  )}
+
+  <!-- ── FAQ (Global Fallback) ──────────────── -->
+  {!isServicePPC && !isServiceSEO && data.faq && data.faq.length > 0 && (
+    <section class="faq-section section" id="faq">
+      <div class="container">
+        <div class="faq-header">
+          <span class="eyebrow">Common Questions</span>
+          <h2 class="heading-lg">Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-list">
+          {data.faq.map((item, i) => (
+            <details class="faq-item reveal" style={`transition-delay: ${i * 60}ms`}>
+              <summary class="faq-q">{item.q}</summary>
+              <p class="faq-a">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ── CTA Band / Bottom Form ─────────────── -->
+  {(data.headerVariant || cfg.headerVariant) === 'ppc' ? (
+    <FiftyFiftyForm
+      eyebrow="Fast & Reliable"
+      headline={data.ctaFormHeadline || data.ctaHeading || cfg.ctaHeading}
+      body={data.ctaSubheading || cfg.ctaSubheading}
+      features={data.ctaFormFeatures}
+      phone={pagePhone}
+      simpleMode={data.ctaFormSimple}
+      servicePreset={data.ctaFormServicePreset}
+      formId={resolvedFormId}
+    />
+  ) : (
+    <CTA
+      heading={data.ctaHeading || cfg.ctaHeading}
+      subheading={data.ctaSubheading || cfg.ctaSubheading}
+      phone={pagePhone}
+      navCTA={cfg.navCTA}
+      navCtaUrl={cfg.navCtaUrl}
+      clientName={cfg.businessName}
+      townName={townName}
+      truckSrc={cfg.truckSrc}
+      logoSrc={cfg.logoSrc}
+    />
+  )}
+
+  <!-- ── Sticky Mobile CTA (PPC only) ───────── -->
+  {/* Sticky mobile CTA removed — FloatingCallButton handles mobile calls */}
+
+
+  <!-- ── Footer ─────────────────────────────── -->
+  {cfg.footerVariant === 'ppc' ? (
+    <FooterPPC
+      businessName={cfg.businessName}
+      phone={pagePhone}
+      address={cfg.address}
+      city={cfg.city}
+      state={cfg.state}
+      zip={cfg.zip}
+    />
+  ) : (
+    <Footer
+      businessName={cfg.businessName}
+      phone={pagePhone}
+      address={cfg.address}
+      city={cfg.city}
+      state={cfg.state}
+      zip={cfg.zip}
+      email={cfg.email}
+      facebook={cfg.facebook}
+      instagram={cfg.instagram}
+      services={cfg.services}
+      serviceAreas={cfg.serviceAreas}
+      siteUrl={cfg.siteUrl}
+    />
+  )}
+  <!-- ── Fixed Bottom-Left Cutout Coupon (Scroll Follower) ── -->
+  {data.promoStamp && (
+    <div class="fixed-coupon-ticket" id="fixed-coupon" role="complementary" aria-label="Special offer">
+      <button class="coupon-close-btn" id="coupon-close" aria-label="Dismiss offer">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <a href={`tel:${pagePhone.replace(/\D/g, '')}`} class="coupon-ticket-inner">
+        <svg class="scissors-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>
+        <span class="coupon-text" set:html={data.promoStamp.replace(/\|/g, '<br><span class="coupon-highlight">')} />
+        {data.couponExpiry && <p class="coupon-fine-print">{data.couponExpiry}</p>}
+      </a>
+    </div>
+  )}
+
+</BaseLayout>
+
+<style>
+/* ── FAQ ── */
+.faq-section { background: var(--color-surface); }
+.faq-header { text-align: center; margin-bottom: 48px; }
+.faq-header .eyebrow { display: block; margin-bottom: 12px; }
+.faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+.faq-item {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition-base);
+}
+.faq-item[open] { border-color: var(--color-primary); }
+.faq-item[open] .faq-q::after { transform: rotate(180deg); }
+
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 24px;
+  font-family: var(--font-heading);
+  font-size: 1rem; font-weight: 700;
+  cursor: pointer; list-style: none; color: var(--color-text);
+}
+.faq-q::-webkit-details-marker { display: none; }
+.faq-q::after {
+  content: '↓'; font-size: 0.9rem; color: var(--color-primary);
+  transition: transform var(--transition-base); flex-shrink: 0;
+}
+.faq-a {
+  padding: 0 24px 20px;
+  color: var(--color-text-muted); line-height: 1.75; font-size: 0.95rem;
+}
+
+/* ── Fixed Bottom-Left Cutout Coupon ── */
+.fixed-coupon-ticket {
+  position: fixed; bottom: 24px; left: 24px; z-index: 999999;
+  width: 250px; text-decoration: none;
+  background: rgba(255, 255, 255, 0.98); border-radius: 8px;
+  box-shadow: 0 16px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.05);
+  transform: translateY(150px) scale(0.9);
+  transform-origin: bottom left;
+  opacity: 0; pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 4px;
+}
+.fixed-coupon-ticket.is-visible {
+  transform: translateY(0) scale(1);
+  opacity: 1; pointer-events: auto;
+}
+.fixed-coupon-ticket:hover {
+  transform: translateY(-4px) scale(1.03);
+}
+/* punching holes */
+.fixed-coupon-ticket::before,
+.fixed-coupon-ticket::after {
+  content: ''; position: absolute; top: 50%; width: 14px; height: 14px; 
+  background: var(--color-surface); 
+  border-radius: 50%; transform: translateY(-50%); z-index: 5;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+}
+.fixed-coupon-ticket::before { left: -7px; }
+.fixed-coupon-ticket::after { right: -7px; }
+
+.fixed-coupon-ticket .coupon-ticket-inner {
+  display: block;
+  border: 2px dashed var(--color-accent); border-radius: 6px;
+  padding: 14px 18px; position: relative; text-align: center;
+  text-decoration: none; color: inherit;
+  transition: background 0.2s ease;
+}
+.fixed-coupon-ticket:hover .coupon-ticket-inner {
+  background: rgba(246, 138, 30, 0.05);
+}
+.fixed-coupon-ticket .scissors-icon {
+  position: absolute; top: -10px; left: 12px;
+  width: 18px; height: 18px; color: var(--color-accent);
+  background: #fff; padding: 0 2px;
+}
+.fixed-coupon-ticket .coupon-text {
+  font-family: var(--font-heading); font-size: 1.05rem; font-weight: 800;
+  color: var(--color-text); line-height: 1.1; text-transform: uppercase;
+  display: block;
+}
+.fixed-coupon-ticket .coupon-text :global(.coupon-highlight) {
+  display: block; font-size: 1.6rem; font-weight: 900;
+  color: var(--color-accent); margin-top: 4px;
+}
+.fixed-coupon-ticket .coupon-fine-print {
+  font-size: 0.65rem;
+  color: var(--color-text-muted, #6b7280);
+  margin-top: 6px;
+  line-height: 1.3;
+  font-style: italic;
+}
+
+/* Close button — mobile only */
+.coupon-close-btn {
+  display: none;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  color: #666;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  padding: 0;
+}
+.coupon-close-btn:hover { background: #f5f5f5; color: #333; }
+
+@media (max-width: 768px) {
+  .coupon-close-btn { display: flex; }
+}
+
+@media (max-width: 768px) {
+  .fixed-coupon-ticket {
+    bottom: 16px; left: 16px; width: 200px;
+    transform-origin: bottom left;
+  }
+  .fixed-coupon-ticket.is-visible {
+    transform: translateY(0) scale(0.85);
+  }
+}
+
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const fixedCoupon = document.getElementById('fixed-coupon');
+    const closeBtn    = document.getElementById('coupon-close');
+    if (!fixedCoupon) return;
+
+    // Don't show if user already dismissed this session
+    if (sessionStorage.getItem('couponDismissed')) return;
+
+    // Trigger entrance animation on scroll
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        fixedCoupon.classList.add('is-visible');
+      } else {
+        fixedCoupon.classList.remove('is-visible');
+      }
+    });
+
+    // Close button — dismiss and remember for session
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fixedCoupon.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        fixedCoupon.style.opacity = '0';
+        fixedCoupon.style.transform = 'translateY(12px) scale(0.9)';
+        setTimeout(() => fixedCoupon.style.display = 'none', 260);
+        sessionStorage.setItem('couponDismissed', '1');
+      });
+    }
+  });
+</script>

@@ -1,0 +1,13 @@
+# AI Agent Operations & Git Safety
+
+You are assisting with the development of a production website. Because multiple developers and AI agents are working on this repository simultaneously, you MUST adhere to the following Git safety rules before executing any code changes.
+
+## 🚨 CRITICAL GIT WORKFLOW 🚨
+
+1. **ALWAYS PULL FIRST:** Before you analyze files, plan changes, or write any code, you MUST execute `git pull origin main` (or the respective branch) to ensure you have the latest changes. Do not assume your local environment is up to date.
+2. **USE FEATURE BRANCHES:** If the task requires more than a simple typo fix, create a new branch (`git checkout -b feature/name-of-feature`) instead of working directly on `main`.
+3. **DO NOT OVERWRITE BLINDLY:** If a `git push` fails due to the remote containing work that you do not have locally (e.g., another developer pushed changes while you were working), **DO NOT FORCE PUSH (`git push -f`)**. 
+4. **RESOLVE CONFLICTS:** If there is a merge conflict or a push rejection, pull the latest changes, resolve the conflicts safely, and ask the user to verify before proceeding.
+5. **COMMIT FREQUENTLY:** Make logical, atomic commits with clear messages so work is easily tracked and revertible.
+
+By strictly following these rules, you will prevent overriding the work of Alexander or any other team member on the repository.

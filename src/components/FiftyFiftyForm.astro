@@ -1,0 +1,442 @@
+---
+import { FORM_IDS } from '../content/formRegistry';
+
+interface Props {
+  eyebrow?: string;
+  headline?: string;
+  body?: string;
+  features?: string[];
+  phone: string;
+  simpleMode?: boolean;
+  servicePreset?: string;
+  formId?: string; // from formRegistry — e.g. 'contact-form-fort-lauderdale'
+}
+
+const { 
+  eyebrow = "Get a Free Quote",
+  headline = "Ready to Upgrade Your Comfort?",
+  body = "Fill out the form to schedule a free, no-obligation in-home consultation. Our degreed engineers will evaluate your home and design a system tailored for maximum comfort and efficiency.",
+  features = ["Upfront, Honest Pricing", "Free In-Home Estimates", "Flexible Financing Options"],
+  phone,
+  simpleMode = false,
+  servicePreset,
+  formId,
+} = Astro.props;
+
+// If formId is missing or not a registered value, show a warning instead of a real form.
+const isValidForm = formId && (FORM_IDS as readonly string[]).includes(formId);
+---
+
+<section class="split-form-section" id="cta-section">
+  <div class="split-form-container">
+    
+    <!-- Left: Content -->
+    <div class="split-content reveal">
+      {eyebrow && <span class="split-eyebrow">{eyebrow}</span>}
+      <h2 class="split-heading">{headline}</h2>
+      <p class="split-body">{body}</p>
+      
+      {features && features.length > 0 && (
+        <ul class="split-features">
+          {features.map((f, i) => (
+            <li style={`transition-delay: ${i * 0.15}s`}>{f}</li>
+          ))}
+        </ul>
+      )}
+
+      <div class="split-contact-info">
+        <p class="direct-call-text">Need immediate service? Call us directly:</p>
+        <a href={`tel:${phone.replace(/\D/g, '')}`} class="split-phone-link">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          {phone}
+        </a>
+      </div>
+    </div>
+
+    <!-- Right: Form Card -->
+    <div class="split-form-side reveal" style="transition-delay: 0.2s">
+      <div class="hero-form-card">
+
+        {!isValidForm ? (
+          <!-- ⚠️ NO FORM ASSIGNED — shown when formId is missing or not in the registry -->
+          <div class="form-unassigned-warning">
+            <div class="form-warn-icon">⚠️</div>
+            <h3 class="form-warn-title">Form Not Configured</h3>
+            <p class="form-warn-body">
+              This page has no <code>formId</code> set in its frontmatter. No real form will appear here until one is chosen.
+            </p>
+            <p class="form-warn-label">Set one of these in the page <code>.md</code> file:</p>
+            <ul class="form-warn-list">
+              <li><code>formId: "contact-form-fort-lauderdale"</code></li>
+              <li><code>formId: "contact-form-tampa"</code></li>
+              <li><code>formId: "contact-form-fort-myers"</code></li>
+              <li><code>formId: "contact-form-orlando"</code></li>
+            </ul>
+            <p class="form-warn-footer">To add a new location form, edit <code>src/content/formRegistry.ts</code> first.</p>
+          </div>
+        ) : (
+          <>
+            <a href={`tel:${phone.replace(/\D/g, '')}`} class="form-heading-link"><h3 class="form-heading">📞 {headline}</h3></a>
+            <p class="form-subheading">Fill out the form and we'll have someone out same day.</p>
+
+        <!-- MASTER CONTACT FORM — id and name come from formRegistry -->
+        <form class="contact-form" id={formId} name={formId} action="/" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value={formId} />
+          {servicePreset && <input type="hidden" name="contact-service" value={servicePreset} />}
+          <p class="hidden" style="display: none;">
+            <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+          </p>
+          <input type="text" name="contact-name" id="contact-name-split" placeholder="Your Full Name" required autocomplete="name">
+          <input type="email" name="contact-email" id="contact-email-split" placeholder="Email Address" required autocomplete="email">
+          <input type="tel" name="contact-phone" id="contact-phone-split" placeholder="Phone Number" required autocomplete="tel">
+          <input type="text" name="contact-zip" id="contact-zip-split" placeholder="Zip Code" required autocomplete="postal-code" inputmode="numeric" maxlength="5">
+          <select name="contact-issue" id="contact-issue-split">
+            <option value="">What's the issue?</option>
+            <option value="AC Not Cooling">AC Not Cooling</option>
+            <option value="AC Blowing Warm Air">AC Blowing Warm Air</option>
+            <option value="AC Making Noise">AC Making Noise</option>
+            <option value="AC Leaking Water">AC Leaking Water</option>
+            <option value="AC Won't Turn On">AC Won't Turn On</option>
+            <option value="High Energy Bills">High Energy Bills</option>
+            <option value="Need a Tune-Up">Need a Tune-Up</option>
+            <option value="AC Installation">AC Installation</option>
+            <option value="Other">Other / Not Sure</option>
+          </select>
+
+          <div class="form-trust-inline">
+            <span class="form-stars">★★★★★</span>
+            <span>4.9 · 1,100+ Google Reviews</span>
+          </div>
+
+          <button type="submit" class="contact-form-submit">
+              Book My Same-Day Repair
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+          </button>
+        </form>
+        <!-- /SHARED CONTACT FORM -->
+
+            <p class="form-privacy">🔒 Your information is secure and never shared.</p>
+          </>
+        )}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+/* ── Form Not Configured Warning ───────────────────────────────────────── */
+.form-unassigned-warning {
+  background: #fffbeb;
+  border: 3px dashed #f59e0b;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+.form-warn-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.form-warn-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+.form-warn-body {
+  font-size: 0.9rem;
+  color: #78350f;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+.form-warn-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+.form-warn-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+}
+.form-warn-list li code {
+  display: block;
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  color: #78350f;
+  font-family: monospace;
+}
+.form-warn-footer {
+  font-size: 0.78rem;
+  color: #92400e;
+  margin: 0;
+}
+.form-warn-footer code {
+  background: #fef3c7;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+}
+
+.split-form-section {
+  padding: 8rem 1.5rem;
+  background: var(--color-surface);
+  position: relative;
+  overflow: hidden;
+  scroll-margin-top: 90px; /* offset for sticky header */
+}
+
+.split-form-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(3rem, 6vw, 6rem);
+  align-items: center;
+}
+
+/* Left Content Styles (Mirrors FiftyFifty.astro precisely) */
+.split-content { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.split-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-heading); font-size: 0.73rem;
+  font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--color-primary);
+}
+.split-eyebrow::before {
+  content: ''; display: block; width: 22px; height: 2px;
+  background: var(--color-primary); border-radius: 2px;
+}
+
+.split-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800; line-height: 1.15; color: var(--color-text);
+}
+
+.split-body { font-size: 1.1rem; color: var(--color-text-muted); line-height: 1.7; }
+
+.split-features { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; }
+.split-features li {
+  display: flex; align-items: center; gap: 1rem;
+  font-size: 1.05rem; color: var(--color-text); font-weight: 500;
+  opacity: 0; transform: translateX(-18px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.is-visible .split-features li { opacity: 1; transform: none; }
+.split-features li::before {
+  content: ''; display: block; width: 24px; height: 24px; min-width: 24px;
+  border-radius: 50%;
+  background: rgba(37,99,235,0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3 8l3.5 3.5L13 4' stroke='%232563EB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center / 14px;
+}
+
+.split-contact-info {
+  margin-top: var(--space-4);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.direct-call-text {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  margin-bottom: var(--space-2);
+}
+
+.split-phone-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.split-phone-link:hover { color: var(--color-primary-dark); }
+.split-phone-link svg { width: 24px; height: 24px; }
+
+
+/* Right Form Card Styles (Mirrors hero form card) */
+.hero-form-card {
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-6);
+  box-shadow: var(--shadow-xl), 0 0 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+  width: 100%;
+}
+
+.form-heading-link {
+  text-decoration: none;
+  display: block;
+}
+.form-heading-link:hover .form-heading {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.form-heading {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--color-text);
+  text-align: center;
+  margin-bottom: 4px;
+  transition: color 0.2s ease;
+}
+
+.form-subheading {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+/* Base form inputs */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea {
+  width: 100%;
+  padding: 16px 18px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: #f9fafb;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: #9CA3AF;
+}
+
+.contact-form input:focus,
+.contact-form select:focus,
+.contact-form textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+  background: #ffffff;
+}
+
+.contact-form select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 18px center;
+  background-size: 16px;
+  color: #9CA3AF;
+}
+
+.contact-form select:valid { color: var(--color-text); }
+.contact-form textarea { resize: vertical; min-height: 100px; }
+
+.contact-form-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 18px 32px;
+  background: var(--color-accent);
+  color: white;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 8px;
+}
+
+.contact-form-submit:hover {
+  background: #e08e0a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+}
+
+.contact-form-submit svg {
+  width: 18px;
+  height: 18px;
+  transition: transform var(--transition-fast);
+}
+
+.contact-form-submit:hover svg { transform: translateX(4px); }
+
+.form-privacy {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.form-trust-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #64748B;
+  font-weight: 600;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.form-stars {
+  color: #FBBF24;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+/* Animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+  .split-form-container {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .split-heading { text-align: center; }
+  .split-eyebrow { width: 100%; justify-content: center; }
+  .split-eyebrow::before { display: none; }
+  .split-body { text-align: center; }
+  .split-features { margin: 0 auto; display: inline-flex; align-items: flex-start; }
+  .split-contact-info { text-align: center; }
+  .hero-form-card { padding: var(--space-6) var(--space-5); }
+}
+</style>

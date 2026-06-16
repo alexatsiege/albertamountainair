@@ -1,0 +1,277 @@
+---
+
+interface Props {
+  heading?: string;
+  factors: {
+    title: string;
+    description: string;
+    pricePoint?: 'Low' | 'Medium' | 'High' | 'Varies';
+    exactRange?: string;
+  }[];
+}
+
+const { 
+  heading = "What Influences The Cost?",
+  factors = []
+} = Astro.props;
+---
+
+{factors.length > 0 && (
+  <section class="cp-section section" id="pricing-factors">
+    <div class="container" style="position: relative; z-index: 2;">
+      <div class="cp-header">
+        <span class="eyebrow">Transparent Pricing</span>
+        <h2 class="heading-lg">{heading}</h2>
+        <p class="cp-subtitle">We believe in upfront, honest diagnosing. While every home is unique, here are the main factors that dictate your repair or installation cost.</p>
+      </div>
+
+      <div class="cp-grid">
+        {factors.map((factor) => (
+          <div class="cp-card reveal">
+            <div class="cp-top">
+              {factor.exactRange ? (
+                <div class="cp-range-badge">{factor.exactRange}</div>
+              ) : (
+                <div class="cp-gauge-wrapper">
+                  <div class={`cp-meter meter-${factor.pricePoint?.toLowerCase() || 'varies'}`}>
+                    <div class="cp-meter-fill"></div>
+                  </div>
+                  <span class="cp-point-label">{factor.pricePoint || 'Varies'} Impact</span>
+                </div>
+              )}
+            </div>
+            <div class="cp-content">
+              <h3 class="cp-title">{factor.title}</h3>
+              <p class="cp-desc">{factor.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* ── Flowing Section Divider Arrows (CSS Optimized) ── */}
+    <div class="cp-arrow-dividers" aria-hidden="true">
+      
+      <!-- Orange Arrow (Left to Right) -->
+      <div class="cp-beam-wrapper right-flow">
+        <div class="cp-beam orange-beam"></div>
+        <svg class="cp-tip orange-tip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
+
+      <!-- Blue Arrow (Right to Left) -->
+      <div class="cp-beam-wrapper left-flow">
+        <svg class="cp-tip blue-tip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <div class="cp-beam blue-beam"></div>
+      </div>
+
+    </div>
+  </section>
+)}
+
+<style>
+.cp-section {
+  background: var(--color-bg-alt, #f8fafc);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding: 100px 0 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Arrow Dividers (CSS Driven) ── */
+.cp-arrow-dividers {
+  width: 100%;
+  margin-top: 50px;
+  opacity: 0.15; /* Subtle branding */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.cp-beam-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.cp-beam {
+  height: 4px;
+  border-radius: 4px;
+}
+.cp-tip {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Colors */
+.orange-beam { background: var(--color-accent, #f68a1e); }
+.orange-tip { stroke: var(--color-accent, #f68a1e); }
+.blue-beam { background: var(--color-primary-dark, #0f172a); }
+.blue-tip { stroke: var(--color-primary-dark, #0f172a); }
+
+/* Animation - Left to Right */
+.right-flow .cp-beam {
+  animation: draw-right-beam 4s ease-in-out infinite;
+}
+.right-flow .cp-tip {
+  animation: draw-right-tip 4s ease-in-out infinite;
+  margin-left: -4px;
+}
+@keyframes draw-right-beam {
+  0% { width: 0%; transform: translateX(-100%); }
+  35% { width: 100%; transform: translateX(0); }
+  65% { width: 100%; transform: translateX(0); }
+  100% { width: 100%; transform: translateX(100%); }
+}
+@keyframes draw-right-tip {
+  0% { transform: translateX(-100vw); opacity: 0; }
+  2% { opacity: 1; }
+  35% { transform: translateX(0); opacity: 1; }
+  65% { transform: translateX(0); opacity: 1; }
+  98% { opacity: 1; }
+  100% { transform: translateX(100vw); opacity: 0; }
+}
+
+/* Animation - Right to Left */
+.left-flow { align-items: center; justify-content: flex-end; }
+.left-flow .cp-beam {
+  animation: draw-left-beam 4s ease-in-out infinite;
+  animation-delay: 2s;
+  width: 0%;
+}
+.left-flow .cp-tip {
+  animation: draw-left-tip 4s ease-in-out infinite;
+  animation-delay: 2s;
+  margin-right: -4px;
+  opacity: 0;
+}
+@keyframes draw-left-beam {
+  0% { width: 0%; transform: translateX(100%); }
+  35% { width: 100%; transform: translateX(0); }
+  65% { width: 100%; transform: translateX(0); }
+  100% { width: 100%; transform: translateX(-100%); }
+}
+@keyframes draw-left-tip {
+  0% { transform: translateX(100vw); opacity: 0; }
+  2% { opacity: 1; }
+  35% { transform: translateX(0); opacity: 1; }
+  65% { transform: translateX(0); opacity: 1; }
+  98% { opacity: 1; }
+  100% { transform: translateX(-100vw); opacity: 0; }
+}
+
+.cp-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 60px;
+}
+.cp-subtitle {
+  margin-top: 16px;
+  font-size: 1.125rem;
+  color: var(--color-text-light, #64748b);
+  line-height: 1.6;
+}
+
+.cp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cp-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+  border: 1px solid rgba(0,0,0,0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.cp-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+}
+
+.cp-top {
+  margin-bottom: 24px;
+}
+
+/* Range Badge (If exact $ amount is provided) */
+.cp-range-badge {
+  display: inline-block;
+  background: var(--color-primary, #29b0e5);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+/* Gauge Meter (If generic Low/Med/High is provided) */
+.cp-gauge-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.cp-point-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-light, #64748b);
+}
+
+.cp-meter {
+  flex-shrink: 0;
+  width: 80px;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.cp-meter-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  border-radius: 4px;
+}
+
+/* Gauge Colors */
+.meter-low .cp-meter-fill { width: 33%; background: #10b981; }
+.meter-medium .cp-meter-fill { width: 66%; background: #f59e0b; }
+.meter-high .cp-meter-fill { width: 100%; background: #ef4444; }
+.meter-varies .cp-meter-fill { 
+  width: 100%; 
+  background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); 
+}
+
+.cp-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--color-text, #1e293b);
+  margin-bottom: 12px;
+}
+.cp-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-text-light, #64748b);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .cp-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+}
+@media (max-width: 640px) {
+  .cp-grid { grid-template-columns: 1fr; }
+  .cp-card { padding: 24px; }
+  .cp-header { margin-bottom: 40px; }
+}
+</style>

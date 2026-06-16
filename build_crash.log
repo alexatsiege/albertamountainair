@@ -1,0 +1,23 @@
+
+> one-way-air-ppc@0.0.1 build
+> node scripts/fetch-reviews.js && astro build
+
+ℹ️  GOOGLE_PLACES_API_KEY not set — skipping review fetch. Using existing YAML data.
+18:12:53 [content] Syncing content
+18:12:53 [content] Content config changed
+18:12:53 [content] Clearing content store
+[InvalidContentEntryDataError] pages → one-way-air--ac-repair-ppc data does not match collection schema.
+
+  pricingFactors.0.description**: **pricingFactors.0.description: Required
+  pricingFactors.1.description**: **pricingFactors.1.description: Required
+  pricingFactors.2.description**: **pricingFactors.2.description: Required
+
+  Hint:
+    See https://docs.astro.build/en/guides/content-collections/ for more information on content schemas.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/invalid-content-entry-data-error/
+  Location:
+    /Users/cheviepublicover/Documents/Antigravity Projects/Website Builder | Anti Gravity/One Way Air PPC/src/content/pages/one-way-air--ac-repair-ppc.md:0:0
+  Stack trace:
+    at getEntryDataAndImages (file:///Users/cheviepublicover/Documents/Antigravity%20Projects/Website%20Builder%20%7C%20Anti%20Gravity/One%20Way%20Air%20PPC/node_modules/astro/dist/content/utils.js:168:26)
+    at async syncData (file:///Users/cheviepublicover/Documents/Antigravity%20Projects/Website%20Builder%20%7C%20Anti%20Gravity/One%20Way%20Air%20PPC/node_modules/astro/dist/content/loaders/glob.js:94:28)

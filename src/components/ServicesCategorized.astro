@@ -1,0 +1,370 @@
+---
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+}
+
+const {
+  eyebrow = 'What We Offer',
+  heading = 'Comprehensive HVAC & Plumbing Services',
+} = Astro.props;
+
+interface Service {
+  name: string;
+  icon: string;
+  slug: string;
+}
+
+const servicesData = [
+  {
+    category: 'AC Services',
+    items: [
+      { name: 'AC Repair & Troubleshooting', icon: 'snow', slug: 'ac-repair' },
+      { name: 'AC Installation', icon: 'snow', slug: 'ac-installation' },
+      { name: 'AC Tune-Up & Maintenance', icon: 'wrench', slug: 'ac-tune-up' },
+      { name: 'Emergency AC Repair', icon: 'siren', slug: 'ac-repair' },
+      { name: 'Refrigerant Recharge', icon: 'drop', slug: 'ac-repair' },
+      { name: 'Compressor Replacement', icon: 'flash', slug: 'ac-repair' },
+    ]
+  },
+  {
+    category: 'Heating & Heat Pumps',
+    items: [
+      { name: 'Heat Pump Installation', icon: 'refresh', slug: 'heat-pump-services' },
+      { name: 'Heat Pump Repair', icon: 'wrench', slug: 'heat-pump-services' },
+      { name: 'Ductless Mini-Splits', icon: 'wind', slug: 'heat-pump-services' },
+      { name: 'Thermostat Upgrades', icon: 'thermometer', slug: 'ac-tune-up' },
+      { name: 'HVAC System Replacement', icon: 'refresh', slug: 'ac-installation' },
+      { name: 'Preventive Maintenance', icon: 'shield', slug: 'ac-tune-up' },
+    ]
+  },
+  {
+    category: 'Indoor Air Quality',
+    items: [
+      { name: 'Air Purifiers', icon: 'leaf', slug: 'indoor-air-quality' },
+      { name: 'UV Air Sanitizers', icon: 'shield', slug: 'indoor-air-quality' },
+      { name: 'Air Duct Cleaning', icon: 'wind', slug: 'indoor-air-quality' },
+      { name: 'Dehumidifiers', icon: 'sun', slug: 'indoor-air-quality' },
+      { name: 'Allergen Reduction', icon: 'heart', slug: 'indoor-air-quality' },
+      { name: 'Whole-Home Ventilation', icon: 'drop', slug: 'indoor-air-quality' },
+    ]
+  }
+];
+
+const renderIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'snow':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5l-5 5M7 5l5 5M19 12h-4M5 12h4M17 19l-5-5M7 19l5-5"/></svg>`;
+    case 'flame':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>`;
+    case 'drop':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>`;
+    case 'wind':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>`;
+    case 'wrench':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
+    case 'siren':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-3"/><path d="M12 2a7 7 0 0 0-7 7c0 2-1 3.9-3 5.5h20c-2-1.6-3-3.5-3-5.5a7 7 0 0 0-7-7z"/><circle cx="12" cy="5" r="3"/></svg>`;
+    case 'refresh':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`;
+    case 'thermometer':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>`;
+    case 'flash':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+    case 'search':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`;
+    case 'leaf':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 14h8.5"/><path d="M6 10h4.5"/></svg>`;
+    case 'sun':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+    case 'shield':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+    case 'heart':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+    case 'pipe':
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3a2 2 0 0 1-2-2V2"/><path d="M9 18a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H9z"/><path d="M11 22v-4"/><path d="M15 22v-4"/></svg>`;
+    default:
+      return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  }
+};
+
+---
+
+<section class="services-condensed" id="services">
+  <!-- OWA Airflow background -->
+  <div class="services-bg-brands">
+    <div class="bg-airflow-gradient"></div>
+    <svg class="bg-airflow-arrows" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {Array.from({ length: 20 }).map((_, i) => (
+        <g opacity="0.07">
+          <path
+            d={`M${i * 65} ${80 + (i % 4) * 100} L${i * 65 + 30} ${80 + (i % 4) * 100} L${i * 65 + 22} ${74 + (i % 4) * 100} M${i * 65 + 30} ${80 + (i % 4) * 100} L${i * 65 + 22} ${86 + (i % 4) * 100}`}
+            stroke="#29b0e5" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"
+          />
+        </g>
+      ))}
+    </svg>
+  </div>
+
+  <div class="services-container">
+    <div class="services-header">
+      <span class="services-eyebrow">{eyebrow}</span>
+      <h2 class="services-heading">{heading}</h2>
+    </div>
+
+    <!-- Grouped Services Grids (Collapsible) -->
+    <div class="services-categories-wrapper">
+      {servicesData.map((group, index) => (
+        <details class="service-accordion" open={index === 0 ? true : undefined}>
+          <summary class="accordion-header">
+            <h3 class="group-heading">{group.category}</h3>
+            <div class="accordion-icon-wrap">
+              <span class="accordion-icon-bar horizontal"></span>
+              <span class="accordion-icon-bar vertical"></span>
+            </div>
+          </summary>
+          <div class="accordion-body">
+            <div class="services-small-grid">
+              {group.items.map(service => (
+                <a href={`/${service.slug}`} class="mini-service-card">
+                  <div class="mini-icon" set:html={renderIcon(service.icon)} />
+                  <span class="mini-title">{service.name}</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mini-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </a>
+              ))}
+            </div>
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+.services-condensed {
+  background: var(--color-bg);
+  padding: 80px 24px 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.services-bg-brands {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bg-airflow-gradient {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 10% 50%, color-mix(in srgb, var(--color-primary) 5%, transparent) 0%, transparent 55%);
+}
+.bg-airflow-arrows {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
+}
+
+.services-container {
+  max-width: 1040px; margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.services-header {
+  text-align: center; margin-bottom: 56px;
+}
+
+.services-eyebrow {
+  display: inline-block;
+  font-size: 0.85rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+}
+
+.services-heading {
+  font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3rem); font-weight: 900;
+  color: var(--color-heading); line-height: 1.1;
+  max-width: 800px; margin: 0 auto;
+}
+
+.services-categories-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.service-accordion {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 40px rgba(15, 34, 64, 0.12);
+  overflow: hidden;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.service-accordion:hover {
+  box-shadow: 0 16px 50px rgba(15, 34, 64, 0.2);
+  transform: translateY(-2px);
+}
+
+.service-accordion[open] {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 50px rgba(15, 34, 64, 0.18);
+  border-color: rgba(15, 34, 64, 0.1);
+}
+
+.accordion-header {
+  list-style: none; /* remove default triangle */
+  padding: 18px 28px;
+  background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(245,247,252,0.6) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: background 300ms ease;
+  border-radius: 12px;
+}
+
+.service-accordion[open] .accordion-header {
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(135deg, rgba(239,243,250,0.5) 0%, rgba(255,255,255,0) 100%);
+  border-bottom: 1px solid rgba(15, 34, 64, 0.06);
+}
+
+.accordion-header::-webkit-details-marker {
+  display: none;
+}
+
+.group-heading {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #1a3a6c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--color-primary); /* Fallback */
+  margin: 0;
+}
+
+.accordion-icon-wrap {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent); /* AHP Red */
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(246, 138, 30, 0.3);
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.accordion-header:hover .accordion-icon-wrap {
+  transform: scale(1.08) rotate(90deg); /* nice animated flip on hover */
+  box-shadow: 0 6px 16px rgba(246, 138, 30, 0.4);
+}
+
+.accordion-icon-bar {
+  position: absolute;
+  background: #ffffff; /* White + and - */
+  border-radius: 2px;
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.accordion-icon-bar.horizontal {
+  width: 16px;
+  height: 2px;
+}
+
+.accordion-icon-bar.vertical {
+  width: 2px;
+  height: 16px;
+}
+
+.service-accordion[open] .accordion-icon-bar.vertical {
+  transform: rotate(90deg);
+  opacity: 0;
+}
+
+.accordion-body {
+  padding: 0 32px 32px 32px;
+  animation: slideDown 300ms ease-out forwards;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.services-small-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.mini-service-card {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border: 1px solid rgba(0,0,0,0.06);
+  padding: 14px 18px; border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  text-decoration: none; color: var(--color-text);
+  font-weight: 600; font-size: 0.95rem;
+  transition: all 250ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-service-card::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+  background: var(--color-primary);
+  opacity: 0; transition: opacity 250ms ease;
+}
+
+.mini-icon {
+  width: 34px; height: 34px;
+  background: var(--color-primary-ultra-light);
+  color: var(--color-primary);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.mini-icon :global(svg) { width: 16px; height: 16px; }
+
+.mini-title { flex: 1; line-height: 1.3; }
+
+.mini-arrow {
+  width: 16px; height: 16px;
+  color: #9CA3AF;
+  transition: transform 250ms ease, color 250ms ease;
+  flex-shrink: 0;
+}
+
+.mini-service-card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: rgba(41, 176, 229, 0.2);
+}
+
+.mini-service-card:hover::before {
+  opacity: 1;
+  background: var(--color-primary);
+}
+
+.mini-service-card:hover .mini-icon {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.mini-service-card:hover .mini-arrow {
+  transform: translateX(4px);
+  color: var(--color-accent);
+}
+
+@media (max-width: 640px) {
+  .services-small-grid { grid-template-columns: 1fr; }
+  .mini-service-card { padding: 20px; }
+}
+</style>

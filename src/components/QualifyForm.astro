@@ -1,0 +1,526 @@
+---
+// QualifyForm.astro — Multi-step Mass Save® qualification form
+// 3 steps: Home Info → Contact Info → Qualification Result
+
+interface Props {
+  phone: string;
+  rebateAmount?: string;
+  programName?: string;
+}
+
+const {
+  phone,
+  rebateAmount = "$8,500",
+  programName = "Mass Save®",
+} = Astro.props;
+---
+
+<section class="qualify-section" id="contact-form-split">
+  <div class="qualify-container">
+
+    <!-- Left: Why Qualify -->
+    <div class="qualify-info">
+      <span class="qualify-eyebrow">See If You Qualify</span>
+      <h2 class="qualify-heading">You Could Save Up&nbsp;To <span class="qualify-amount">{rebateAmount}</span></h2>
+      <p class="qualify-body">The {programName} program offers Massachusetts homeowners significant rebates on heat pump installations. Answer a few quick questions to see if your home qualifies.</p>
+
+      <ul class="qualify-perks">
+        <li>
+          <span class="perk-icon">💰</span>
+          <div>
+            <strong>Up to {rebateAmount} in rebates</strong>
+            <span>For whole-home heat pump systems</span>
+          </div>
+        </li>
+        <li>
+          <span class="perk-icon">👷</span>
+          <div>
+            <strong>Engineer-Designed Systems</strong>
+            <span>Manual J calculations by degreed engineers</span>
+          </div>
+        </li>
+        <li>
+          <span class="perk-icon">📋</span>
+          <div>
+            <strong>We Handle All Paperwork</strong>
+            <span>Rebate application managed for you</span>
+          </div>
+        </li>
+        <li>
+          <span class="perk-icon">0%</span>
+          <div>
+            <strong>Zero-Percent Financing</strong>
+            <span>Available through {programName} program</span>
+          </div>
+        </li>
+      </ul>
+
+      <div class="qualify-phone">
+        <p>Prefer to talk? Call us directly:</p>
+        <a href={`tel:${phone.replace(/\D/g, '')}`}>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          {phone}
+        </a>
+      </div>
+    </div>
+
+    <!-- Right: Multi-step Form -->
+    <div class="qualify-form-card">
+      <!-- Progress Bar -->
+      <div class="qf-progress">
+        <div class="qf-progress-bar" id="qfBar" style="width: 33.3%"></div>
+      </div>
+      <div class="qf-steps-indicator">
+        <span class="qf-step-dot active" data-step="1">1</span>
+        <span class="qf-step-line"></span>
+        <span class="qf-step-dot" data-step="2">2</span>
+        <span class="qf-step-line"></span>
+        <span class="qf-step-dot" data-step="3">3</span>
+      </div>
+
+      <form id="qualifyForm" name="masssave-qualify" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="masssave-qualify" />
+        <p class="hidden" style="display: none;"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+        <!-- STEP 1: Your Home -->
+        <div class="qf-step active" data-qf-step="1">
+          <h3 class="qf-step-title">Tell Us About Your Home</h3>
+          <p class="qf-step-sub">We'll use this to check your eligibility.</p>
+
+          <label class="qf-label">What is your current heating system?</label>
+          <div class="qf-radio-group">
+            <label class="qf-radio"><input type="radio" name="heating-type" value="oil" required /><span>🛢️ Oil</span></label>
+            <label class="qf-radio"><input type="radio" name="heating-type" value="gas" /><span>🔥 Natural Gas</span></label>
+            <label class="qf-radio"><input type="radio" name="heating-type" value="propane" /><span>⛽ Propane</span></label>
+            <label class="qf-radio"><input type="radio" name="heating-type" value="electric" /><span>⚡ Electric</span></label>
+          </div>
+
+          <label class="qf-label">Do you own your home?</label>
+          <div class="qf-radio-group qf-radio-inline">
+            <label class="qf-radio"><input type="radio" name="homeowner" value="yes" required /><span>Yes</span></label>
+            <label class="qf-radio"><input type="radio" name="homeowner" value="no" /><span>No</span></label>
+          </div>
+
+          <label class="qf-label" for="qf-zip">Your Zip Code</label>
+          <input type="text" name="zip-code" id="qf-zip" placeholder="e.g. 01453" pattern="[0-9]{5}" maxlength="5" required class="qf-input" />
+
+          <button type="button" class="qf-next-btn" data-qf-next="2">
+            Check Eligibility
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        <!-- STEP 2: Contact Info -->
+        <div class="qf-step" data-qf-step="2">
+          <h3 class="qf-step-title">Almost There!</h3>
+          <p class="qf-step-sub">Enter your info so we can send your personalized quote.</p>
+
+          <label class="qf-label" for="qf-name">Full Name</label>
+          <input type="text" name="qualify-name" id="qf-name" placeholder="John Smith" required class="qf-input" />
+
+          <label class="qf-label" for="qf-email">Email Address</label>
+          <input type="email" name="qualify-email" id="qf-email" placeholder="john@example.com" required class="qf-input" />
+
+          <label class="qf-label" for="qf-phone">Phone Number</label>
+          <input type="tel" name="qualify-phone" id="qf-phone" placeholder="(978) 555-1234" required class="qf-input" />
+
+          <div class="qf-btn-row">
+            <button type="button" class="qf-back-btn" data-qf-back="1">← Back</button>
+            <button type="submit" class="qf-next-btn qf-submit-btn">
+              See My Results
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Results -->
+        <div class="qf-step" data-qf-step="3">
+          <div class="qf-result">
+            <div class="qf-result-icon">🎉</div>
+            <h3 class="qf-result-title">Great News!</h3>
+            <p class="qf-result-text">Based on your answers, your home <strong>may qualify</strong> for up to:</p>
+            <div class="qf-result-amount">{rebateAmount}</div>
+            <p class="qf-result-sub">in {programName} heat pump rebates</p>
+
+            <div class="qf-result-steps">
+              <h4>What Happens Next?</h4>
+              <ol>
+                <li>We'll call you within 1 business day</li>
+                <li>Schedule your <strong>free in-home consultation</strong> with one of our degreed engineers</li>
+                <li>Get a custom quote with your exact rebate amount</li>
+              </ol>
+            </div>
+
+            <a href={`tel:${phone.replace(/\D/g, '')}`} class="qf-result-cta">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Call Now — Skip the Wait
+            </a>
+          </div>
+        </div>
+      </form>
+
+      <p class="qf-privacy">🔒 Your information is secure and never shared.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+.qualify-section {
+  padding: 6rem 1.5rem 8rem;
+  background: var(--color-surface, #F8FAFC);
+  position: relative;
+  overflow: hidden;
+  scroll-margin-top: 90px;
+}
+.qualify-container {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(3rem, 6vw, 6rem); align-items: start;
+}
+
+/* Left info */
+.qualify-info { display: flex; flex-direction: column; gap: 1.5rem; }
+.qualify-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-heading); font-size: 0.73rem;
+  font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--color-primary);
+}
+.qualify-eyebrow::before {
+  content: ''; width: 22px; height: 2px;
+  background: var(--color-primary); border-radius: 2px;
+}
+.qualify-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 800; line-height: 1.15; color: var(--color-text);
+}
+.qualify-amount {
+  color: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent), #D97706);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.qualify-body { font-size: 1rem; color: var(--color-text-muted); line-height: 1.75; }
+
+/* Perks */
+.qualify-perks {
+  list-style: none; padding: 0;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.qualify-perks li {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 0.75rem 1rem; border-radius: 0.75rem;
+  background: rgba(245,158,11,0.04);
+  border: 1px solid rgba(245,158,11,0.1);
+  transition: all 0.2s ease;
+}
+.qualify-perks li:hover { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); }
+.perk-icon {
+  font-size: 1.3rem; min-width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(245,158,11,0.1); border-radius: 0.5rem;
+  font-weight: 800;
+}
+.qualify-perks strong { display: block; font-size: 0.9rem; color: var(--color-text); }
+.qualify-perks span { font-size: 0.8rem; color: var(--color-text-muted); }
+
+/* Phone */
+.qualify-phone { margin-top: 0.5rem; }
+.qualify-phone p { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 0.5rem; }
+.qualify-phone a {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800;
+  color: var(--color-primary); text-decoration: none;
+}
+.qualify-phone a:hover { color: var(--color-primary-dark); }
+.qualify-phone svg { width: 22px; height: 22px; }
+
+/* Form card */
+.qualify-form-card {
+  background: #fff; border-radius: 1.25rem;
+  padding: 2rem 1.75rem;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+/* Progress */
+.qf-progress {
+  height: 4px; background: rgba(0,0,0,0.06); border-radius: 4px;
+  margin-bottom: 1.25rem; overflow: hidden;
+}
+.qf-progress-bar {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  transition: width 0.4s ease;
+}
+.qf-steps-indicator {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin-bottom: 1.75rem;
+}
+.qf-step-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-heading); font-size: 0.75rem; font-weight: 700;
+  background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.35);
+  transition: all 0.3s ease;
+}
+.qf-step-dot.active {
+  background: var(--color-primary); color: #fff;
+  box-shadow: 0 2px 10px rgba(139,26,26,0.3);
+}
+.qf-step-dot.completed {
+  background: var(--color-accent); color: #fff;
+}
+.qf-step-line {
+  width: 40px; height: 2px; background: rgba(0,0,0,0.08);
+}
+
+/* Steps */
+.qf-step { display: none; animation: qfSlide 0.35s ease; }
+.qf-step.active { display: block; }
+@keyframes qfSlide {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.qf-step-title {
+  font-family: var(--font-heading); font-size: 1.4rem; font-weight: 800;
+  color: var(--color-text); text-align: center; margin-bottom: 0.25rem;
+}
+.qf-step-sub {
+  font-size: 0.85rem; color: var(--color-text-muted);
+  text-align: center; margin-bottom: 1.5rem;
+}
+
+/* Form fields */
+.qf-label {
+  display: block; font-size: 0.8rem; font-weight: 600;
+  color: var(--color-text); margin-bottom: 0.4rem; margin-top: 1rem;
+}
+.qf-input {
+  width: 100%; padding: 14px 16px;
+  font-family: var(--font-body); font-size: 0.95rem;
+  color: var(--color-text); background: #f9fafb;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem; outline: none;
+  transition: all 0.2s ease;
+}
+.qf-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139,26,26,0.1);
+  background: #fff;
+}
+
+/* Radio group */
+.qf-radio-group {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+}
+.qf-radio-inline { grid-template-columns: 1fr 1fr; }
+.qf-radio {
+  position: relative; cursor: pointer;
+}
+.qf-radio input { position: absolute; opacity: 0; }
+.qf-radio span {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 12px 16px;
+  border: 1.5px solid var(--color-border, #e5e7eb);
+  border-radius: 0.5rem; font-size: 0.9rem; font-weight: 500;
+  color: var(--color-text-muted); background: #f9fafb;
+  transition: all 0.2s ease;
+}
+.qf-radio input:checked + span {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, white);
+  color: var(--color-primary);
+  font-weight: 600;
+  box-shadow: 0 0 0 3px rgba(139,26,26,0.08);
+}
+.qf-radio:hover span {
+  border-color: rgba(139,26,26,0.3);
+}
+
+/* Buttons */
+.qf-next-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 16px;
+  background: var(--color-primary); color: #fff;
+  font-family: var(--font-heading); font-size: 1rem; font-weight: 700;
+  border: none; border-radius: 50px; cursor: pointer;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 14px rgba(139,26,26,0.25);
+  transition: all 0.2s ease;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.qf-next-btn:hover {
+  background: var(--color-primary-dark); transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139,26,26,0.35);
+}
+.qf-next-btn svg { width: 18px; height: 18px; }
+.qf-submit-btn { background: var(--color-accent); box-shadow: 0 4px 14px rgba(245,158,11,0.3); }
+.qf-submit-btn:hover { background: #e08e0a; box-shadow: 0 8px 24px rgba(245,158,11,0.4); }
+.qf-back-btn {
+  padding: 14px 24px; background: transparent;
+  border: 1.5px solid var(--color-border, #e5e7eb);
+  border-radius: 50px; cursor: pointer;
+  font-family: var(--font-heading); font-size: 0.85rem; font-weight: 600;
+  color: var(--color-text-muted); transition: all 0.2s ease;
+}
+.qf-back-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.qf-btn-row { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+.qf-btn-row .qf-next-btn { flex: 1; }
+
+/* Result */
+.qf-result { text-align: center; padding: 1rem 0; }
+.qf-result-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+.qf-result-title {
+  font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800;
+  color: var(--color-text); margin-bottom: 0.5rem;
+}
+.qf-result-text { font-size: 1rem; color: var(--color-text-muted); }
+.qf-result-amount {
+  font-family: var(--font-heading); font-size: 3.5rem; font-weight: 900;
+  background: linear-gradient(135deg, var(--color-accent), #D97706);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin: 0.5rem 0 0.25rem;
+}
+.qf-result-sub { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
+.qf-result-steps {
+  text-align: left; padding: 1.25rem;
+  background: rgba(245,158,11,0.04); border-radius: 0.75rem;
+  border: 1px solid rgba(245,158,11,0.12); margin-bottom: 1.5rem;
+}
+.qf-result-steps h4 {
+  font-family: var(--font-heading); font-size: 0.85rem; font-weight: 700;
+  color: var(--color-text); margin-bottom: 0.75rem;
+}
+.qf-result-steps ol {
+  padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;
+}
+.qf-result-steps li { font-size: 0.85rem; color: var(--color-text-muted); }
+.qf-result-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 32px; background: var(--color-primary); color: #fff;
+  font-family: var(--font-heading); font-size: 1rem; font-weight: 700;
+  text-decoration: none; border-radius: 50px;
+  box-shadow: 0 4px 14px rgba(139,26,26,0.25);
+  transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.qf-result-cta:hover {
+  background: var(--color-primary-dark); transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139,26,26,0.35);
+}
+.qf-result-cta svg { width: 18px; height: 18px; }
+
+.qf-privacy {
+  font-size: 0.7rem; color: var(--color-text-muted);
+  text-align: center; margin-top: 1rem;
+}
+
+@media (max-width: 900px) {
+  .qualify-container { grid-template-columns: 1fr; }
+  .qualify-heading { text-align: center; }
+  .qualify-eyebrow { justify-content: center; }
+  .qualify-eyebrow::before { display: none; }
+  .qualify-body { text-align: center; }
+  .qualify-phone { text-align: center; }
+}
+</style>
+
+<script>
+  // Multi-step form logic
+  const form = document.getElementById('qualifyForm') as HTMLFormElement;
+  if (form) {
+    const steps = form.querySelectorAll('[data-qf-step]');
+    const bar = document.getElementById('qfBar') as HTMLElement;
+    const dots = document.querySelectorAll('.qf-step-dot');
+    let currentStep = 1;
+
+    function goToStep(n: number) {
+      // Validate current step before advancing
+      if (n > currentStep) {
+        const currentEl = form.querySelector(`[data-qf-step="${currentStep}"]`);
+        const inputs = currentEl?.querySelectorAll('input[required], select[required]') as NodeListOf<HTMLInputElement>;
+        let valid = true;
+        inputs?.forEach(inp => {
+          if (inp.type === 'radio') {
+            const group = form.querySelectorAll(`input[name="${inp.name}"]`);
+            const checked = Array.from(group).some((r: any) => r.checked);
+            if (!checked) valid = false;
+          } else if (!inp.value.trim()) {
+            valid = false;
+          }
+        });
+        if (!valid) {
+          // Trigger native validation
+          const firstInvalid = currentEl?.querySelector(':invalid') as HTMLElement;
+          if (firstInvalid) firstInvalid.focus();
+          return;
+        }
+      }
+
+      currentStep = n;
+      steps.forEach(s => s.classList.remove('active'));
+      form.querySelector(`[data-qf-step="${n}"]`)?.classList.add('active');
+
+      // Update progress
+      bar.style.width = `${(n / 3) * 100}%`;
+      dots.forEach((d, i) => {
+        d.classList.remove('active', 'completed');
+        if (i + 1 === n) d.classList.add('active');
+        else if (i + 1 < n) d.classList.add('completed');
+      });
+    }
+
+    // Next buttons
+    form.querySelectorAll('[data-qf-next]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const next = parseInt((btn as HTMLElement).dataset.qfNext || '1');
+        goToStep(next);
+      });
+    });
+
+    // Back buttons
+    form.querySelectorAll('[data-qf-back]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const back = parseInt((btn as HTMLElement).dataset.qfBack || '1');
+        goToStep(back);
+      });
+    });
+
+    // Form submit → verify reCAPTCHA then show step 3
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // reCAPTCHA v3 verification (uses helpers from BaseLayout)
+      if (typeof getRecaptchaToken === 'function') {
+        const token = await getRecaptchaToken('qualify_form');
+        const passed = await verifyRecaptchaToken(token, 'qualify_form');
+        if (!passed) {
+          const err = form.querySelector('.recaptcha-error') || document.createElement('p');
+          err.className = 'recaptcha-error';
+          err.style.cssText = 'color:#dc2626;font-size:0.85rem;text-align:center;margin-top:0.5rem;';
+          err.textContent = 'Spam check failed. Please try again or call us directly.';
+          if (!form.querySelector('.recaptcha-error')) form.appendChild(err);
+          return;
+        }
+        // Inject token into form data
+        let tokenInput = form.querySelector('input[name="g-recaptcha-response"]');
+        if (!tokenInput) {
+          tokenInput = document.createElement('input');
+          tokenInput.type = 'hidden';
+          tokenInput.name = 'g-recaptcha-response';
+          form.appendChild(tokenInput);
+        }
+        tokenInput.value = token || '';
+      }
+
+      // Submit via fetch
+      const formData = new FormData(form);
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData as any).toString(),
+      }).catch(() => {});
+      goToStep(3);
+    });
+  }
+</script>

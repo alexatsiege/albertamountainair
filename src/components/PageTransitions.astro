@@ -1,0 +1,86 @@
+---
+// PageTransitions.astro
+// Demos the Temperature Sweep and Waving Flag page transitions
+---
+
+<div id="page-transition-overlay" aria-hidden="true">
+  <div class="stripe stripe-1"></div>
+  <div class="stripe stripe-2"></div>
+  <div class="stripe stripe-3"></div>
+</div>
+
+<style>
+/* Base Overlay State */
+#page-transition-overlay {
+  position: fixed; inset: 0; z-index: 99999; pointer-events: none;
+  display: flex; flex-direction: column;
+}
+
+.stripe { flex: 1; transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1); transform-origin: left; transform: scaleX(0); }
+.stripe-1 { background: var(--color-primary); }
+.stripe-2 { background: #ffffff; }
+.stripe-3 { background: #008BCC; }
+
+/* The Waving Flag Transition */
+#page-transition-overlay.animating-flag .stripe { transform: scaleX(1); }
+#page-transition-overlay.animating-flag .stripe-1 { transition-delay: 0s; }
+#page-transition-overlay.animating-flag .stripe-2 { transition-delay: 0.1s; }
+#page-transition-overlay.animating-flag .stripe-3 { transition-delay: 0.2s; }
+
+/* Flag Out Hook (On Load) */
+#page-transition-overlay.flag-out .stripe { transform: scaleX(1); animation: flagOut 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards; }
+#page-transition-overlay.flag-out .stripe-1 { animation-delay: 0s; }
+#page-transition-overlay.flag-out .stripe-2 { animation-delay: 0.1s; }
+#page-transition-overlay.flag-out .stripe-3 { animation-delay: 0.2s; }
+
+@keyframes flagOut { 0% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin: right; } }
+
+
+/* The Temperature Sweep Transition */
+#page-transition-overlay.animating-temp {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  animation: tempIn 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+#page-transition-overlay.temp-out {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  animation: tempOut 1.2s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+@keyframes tempIn { 0% { clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); } 100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); } }
+@keyframes tempOut { 0% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); } 100% { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); } }
+</style>
+
+<script>
+  const overlay = document.getElementById('page-transition-overlay');
+  
+  // Randomly select between the two transitions whenever entering a new route
+  if (overlay) {
+    const rand = Math.random();
+    if (rand > 0.5) {
+      overlay.classList.add('flag-out');
+    } else {
+      overlay.classList.add('temp-out');
+    }
+  }
+
+  // Intercept anchor clicks to demo transition out
+  document.querySelectorAll('a[href^="/"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = link.getAttribute('href');
+      
+      if (overlay) {
+        overlay.classList.remove('flag-out', 'temp-out');
+        
+        if (Math.random() > 0.5) {
+          overlay.classList.add('animating-flag');
+        } else {
+          overlay.classList.add('animating-temp');
+        }
+      }
+      
+      setTimeout(() => { window.location.href = href; }, 800);
+    });
+  });
+</script>

@@ -1,0 +1,269 @@
+---
+// BaseLayout.astro — HTML shell with SEO, schema, and client theme
+import '../styles/global.css';
+import { ViewTransitions } from 'astro:transitions';
+import FloatingCallButton from '../components/FloatingCallButton.astro';
+import ArrowTransition from '../components/ArrowTransition.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  schema?: string[];
+  client: {
+    businessName: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    colorPrimary: string;
+    colorPrimaryDark: string;
+    colorAccent: string;
+    siteUrl: string;
+    schemaDescription?: string;
+    yearFounded?: number;
+    googleRating?: number;
+    googleReviewCount?: number;
+    gtmId?: string;
+    recaptchaSiteKey?: string;
+  };
+  heroBg?: string;
+  pagePhone?: string;         // Page-level phone override (per-city routing)
+  contactLocation?: string;  // Hidden form field value for per-location email routing
+}
+
+const { title, description, ogImage, canonicalUrl, schema = [], client, heroBg, pagePhone, contactLocation } = Astro.props;
+const resolvedPhone = pagePhone || client.phone;
+const pageUrl = canonicalUrl || Astro.url.href;
+const ogImg   = ogImage || `${client.siteUrl}/_assets/og-image.jpg`;
+
+// Build JSON-LD schema based on page schema types
+const schemaObjects = [];
+
+if (schema.includes('HVACBusiness') || schema.includes('LocalBusiness')) {
+  schemaObjects.push({
+    "@context": "https://schema.org",
+    "@type": "HVACBusiness",
+    "name": client.businessName,
+    "description": client.schemaDescription,
+    "telephone": resolvedPhone,
+    "address": { "@type": "PostalAddress", "streetAddress": client.address, "addressLocality": client.city, "addressRegion": client.state },
+    "url": client.siteUrl,
+    "foundingDate": client.yearFounded,
+    "aggregateRating": client.googleRating ? {
+      "@type": "AggregateRating",
+      "ratingValue": client.googleRating,
+      "reviewCount": client.googleReviewCount,
+    } : undefined,
+  });
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <ViewTransitions />
+  {client.gtmId && (
+    <script set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','${client.gtmId}');`} />
+  )}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <link rel="canonical" href={pageUrl}>
+
+  <!-- Google Fonts — non-blocking with media swap trick -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap"></noscript>
+
+  <!-- Preload LCP hero background image -->
+  {heroBg && <link rel="preload" href={heroBg} as="image" type="image/webp" fetchpriority="high" />}
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:image"       content={ogImg}>
+  <meta property="og:url"         content={pageUrl}>
+  <meta property="og:type"        content="website">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content={title}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image"       content={ogImg}>
+
+  <!-- Client brand colors injected as CSS variables -->
+  <style define:vars={{
+    colorPrimary:     client.colorPrimary,
+    colorPrimaryDark: client.colorPrimaryDark,
+    colorAccent:      client.colorAccent,
+    colorText:        '#1A1A2E',
+  }}>
+    :root {
+      --color-primary:      var(--colorPrimary);
+      --color-primary-dark: var(--colorPrimaryDark);
+      --color-accent:       var(--colorAccent);
+      --color-text:         var(--colorText);
+    }
+  </style>
+
+  <!-- JSON-LD Schema -->
+  {schemaObjects.map(obj => (
+    <script type="application/ld+json" set:html={JSON.stringify(obj, null, 2)} />
+  ))}
+
+  <!-- reCAPTCHA v3 — deferred until user interaction for better performance -->
+  {client.recaptchaSiteKey && (
+    <script is:inline define:vars={{ recaptchaSiteKey: client.recaptchaSiteKey }}>
+      (function() {
+        var loaded = false;
+        function loadRecaptcha() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.src = 'https://www.google.com/recaptcha/api.js?render=' + recaptchaSiteKey;
+          s.async = true;
+          document.head.appendChild(s);
+        }
+        ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'].forEach(function(e) {
+          document.addEventListener(e, loadRecaptcha, { once: true, passive: true });
+        });
+        // Fallback: load after 5 seconds anyway
+        setTimeout(loadRecaptcha, 5000);
+      })();
+    </script>
+  )}
+
+  <slot name="head" />
+</head>
+<body>
+{client.gtmId && (
+  <noscript><iframe src={`https://www.googletagmanager.com/ns.html?id=${client.gtmId}`}
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+)}
+
+  <!-- Client-side city geo-detection — replaces {{city}} placeholders -->
+  <script is:inline>
+    (function() {
+      var SERVICE_AREA = [
+        'fort lauderdale', 'davie', 'hollywood', 'boca raton', 'coral springs',
+        'pembroke pines', 'fort myers', 'tampa', 'naples', 'lehigh acres',
+        'kendall', 'sunrise', 'plantation', 'miramar', 'hallandale beach'
+      ];
+      function replaceCity(city) {
+        var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        var node;
+        while ((node = walker.nextNode())) {
+          if (node.textContent.includes('{{city}}'))
+            node.textContent = node.textContent.replaceAll('{{city}}', city);
+        }
+        document.title = document.title.replaceAll('{{city}}', city);
+        var desc = document.querySelector('meta[name="description"]');
+        if (desc) desc.content = desc.content.replaceAll('{{city}}', city);
+      }
+      if (!document.body.innerHTML.includes('{{city}}')) return;
+      replaceCity('Calgary');
+      fetch('https://ipapi.co/json/')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var city = (data.city || '').toLowerCase();
+          if (SERVICE_AREA.includes(city)) {
+            replaceCity(data.city.split(' ').map(function(w) {
+              return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+            }).join(' '));
+          }
+        }).catch(function() {});
+    })();
+  </script>
+
+  <ArrowTransition />
+  <slot />
+
+  <!-- Global scroll reveal -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal, .glass-reveal').forEach(el => observer.observe(el));
+  </script>
+
+  <!-- Form tracking: two real forms, same name — dedup flag ensures one POST + one dataLayer push -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    // Helper: extract form data as plain object (excludes Netlify internals)
+    function getFormData(form) {
+      const data = {};
+      new FormData(form).forEach((val, key) => {
+        if (key !== 'bot-field' && key !== 'form-name') data[key] = val;
+      });
+      return data;
+    }
+
+    // Dedup flag — prevents double POST + double dataLayer if both forms somehow fire
+    let formSubmitted = false;
+
+    // Listen to ALL forms whose name starts with "contact-form"
+    // (covers contact-form-fort-lauderdale, contact-form-tampa, etc. on any location page)
+    document.querySelectorAll('form[name^="contact-form"]').forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (formSubmitted) return; // dedup — ignore if already submitted this session
+        formSubmitted = true;
+
+        const fields = getFormData(form);
+
+        // Single dataLayer push for GTM → Google Ads conversion tag
+        window.dataLayer.push({
+          event: 'form_submission',
+          formName: form.name,               // e.g. 'contact-form-fort-lauderdale'
+          formLocation: fields['contact-location'] || '',
+          ...fields
+        });
+
+        // AJAX POST to Netlify — prevents full page reload
+        fetch(window.location.href, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(new FormData(form)).toString(),
+        }).then(() => {
+          // Replace whichever form card the user submitted
+          const card = form.closest('.hero-form-card, .sg-form-card') || form.parentElement;
+          card.innerHTML = `
+            <div style="text-align:center;padding:2rem 1rem;">
+              <div style="font-size:3rem;margin-bottom:0.75rem;">✅</div>
+              <h3 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:800;color:var(--color-text);margin-bottom:0.5rem;">Thank You!</h3>
+              <p style="font-size:1rem;color:var(--color-text-muted);line-height:1.6;margin-bottom:1rem;">We've received your information. A tech will be in touch shortly.</p>
+              <p style="font-size:0.8rem;color:var(--color-text-muted);">🔒 Your information is secure and never shared.</p>
+            </div>`;
+        }).catch(() => form.submit()); // fallback: native submit if AJAX fails
+      });
+    });
+
+    // QualifyForm tracking (separate multi-step form, not a contact-form instance)
+    const qualifyForm = document.getElementById('qualifyForm');
+    if (qualifyForm) {
+      qualifyForm.addEventListener('submit', function() {
+        const data = {};
+        new FormData(qualifyForm).forEach((val, key) => { data[key] = val; });
+        window.dataLayer.push({ event: 'form_submission', formName: 'qualify-form', ...data });
+      }, true);
+    }
+  </script>
+
+  <FloatingCallButton phone={resolvedPhone} />
+</body>
+</html>

@@ -1,0 +1,129 @@
+businessName: Alberta Mountain Air
+tagline: Calgary's Most Trusted HVAC Company
+phone: (403) 532-6345
+address: Bay 214 - 11929 40 St SE
+city: Calgary
+state: AB
+zip: T2Z 4M8
+email: ''
+siteUrl: https://example.com
+navCTA: Book Service
+navCtaUrl: '#cta'
+heroEyebrow: "Monday-Sunday 8:00am-6:00pm • 24/7 Emergency Service"
+headerVariant: full
+footerVariant: ppc
+colorPrimary: '#0b4ea2'
+colorPrimaryDark: '#082f6b'
+colorAccent: '#d62839'
+colorAccentAlt: '#ef4444'
+colorText: '#2D2D2D'
+heroReviews: []
+yearFounded: 2015
+schemaDescription: Alberta Mountain Air provides trusted heating and cooling services for homeowners in Calgary, Alberta, including furnace repair, air conditioning, maintenance, and system installation.
+servicesEyebrow: What We Offer
+servicesHeading: Heating And Cooling Services For Calgary Homes
+reviewsHeading: Real Reviews from Real Homeowners
+ctaHeading: Book Your HVAC Service Today
+ctaSubheading: Alberta Mountain Air is ready to help with repairs, maintenance, and new system quotes across Calgary.
+
+locations:
+  - name: Calgary
+    address: Bay 214 - 11929 40 St SE
+    city: Calgary
+    state: AB
+    zip: T2Z 4M8
+    slug: calgary
+    placeId: REPLACE_WITH_PLACE_ID
+  - name: Chestermere
+    address: Calgary Region
+    city: Chestermere
+    state: AB
+    zip: ''
+    slug: chestermere
+    placeId: REPLACE_WITH_PLACE_ID
+  - name: Airdrie
+    address: Calgary Region
+    city: Airdrie
+    state: AB
+    zip: ''
+    slug: airdrie
+    placeId: REPLACE_WITH_PLACE_ID
+  - name: Okotoks
+    address: Calgary Region
+    city: Okotoks
+    state: AB
+    zip: ''
+    slug: okotoks
+    placeId: REPLACE_WITH_PLACE_ID
+
+team: []
+
+dealerLogos: []
+
+associations: []
+
+services:
+  - name: Furnace Repair
+    slug: furnace-repair
+    tag: Fast Diagnostics & Repairs
+  - name: Air Conditioning Repair
+    slug: ac-repair
+    tag: Cooling Help When You Need It
+  - name: Furnace Installation
+    slug: furnace-installation
+    tag: Upgrade Comfort With Confidence
+  - name: Air Conditioning Installation
+    slug: ac-installation
+    tag: Efficient Cooling For Summer
+  - name: Heat Pump Services
+    slug: heat-pump-services
+    tag: Year-Round Comfort Solutions
+  - name: Indoor Air Quality
+    slug: indoor-air-quality
+    tag: Cleaner, Healthier Indoor Air
+
+serviceAreas:
+  - county: Calgary
+    towns:
+      - SE Calgary
+      - SW Calgary
+      - NW Calgary
+      - NE Calgary
+      - Downtown Calgary
+      - Mahogany
+      - Seton
+      - Auburn Bay
+      - Cranston
+  - county: Surrounding Communities
+    towns:
+      - Chestermere
+      - Okotoks
+      - Airdrie
+      - Cochrane
+      - Strathmore
+      - High River
+
+facebook: '#'
+instagram: '#'
+logoSrc: /_assets/ama-logo.webp
+truckSrc: ''
+techCutout: /_assets/one way air team1.webp
+mapEmbedUrl: "https://www.google.com/maps?q=Bay%20214%20-%2011929%2040%20St%20SE%20Calgary%20AB%20T2Z%204M8&output=embed"
+gtmId: ''
+recaptchaSiteKey: ''
+videoSrc: /_assets/OWA Commercial.mp4
+videoThumbnail: /_assets/HERO-BG.webp
+
+googleReviews: []
+
+phones:
+  - id: calgary-main
+    label: "Calgary Main Line"
+    number: "(403) 532-6345"
+    description: "Primary Alberta Mountain Air phone number"
+
+forms:
+  - id: contact-form-calgary
+    label: "Calgary"
+    netlifyName: "contact-form-calgary"
+    description: "All Alberta Mountain Air / Calgary pages"

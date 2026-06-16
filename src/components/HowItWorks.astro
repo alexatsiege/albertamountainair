@@ -1,0 +1,340 @@
+---
+// HowItWorks.astro — Horizontal process steps module for PPC pages
+// Answers "what happens after I call?" to reduce lead anxiety
+
+interface Step {
+  number: string;
+  icon: string; // 'phone' | 'calendar' | 'truck' | 'clipboard' | 'check'
+  title: string;
+  description: string;
+}
+
+interface Props {
+  heading?: string;
+  eyebrow?: string;
+  steps?: Step[];
+  phone?: string;
+}
+
+const {
+  heading = "Get Your AC Fixed Today in 5 Simple Steps",
+  eyebrow = "Our Hassle-Free Process",
+  phone,
+  steps = [
+    {
+      number: "01",
+      icon: "phone",
+      title: "Call or Book Online",
+      description: "Call us directly or submit our quick online form. A real team member picks up — no hold music, no robots."
+    },
+    {
+      number: "02",
+      icon: "calendar",
+      title: "Same-Day Scheduling",
+      description: "We book you for the same day whenever possible and give you a tight 2-hour arrival window. No all-day waiting."
+    },
+    {
+      number: "03",
+      icon: "truck",
+      title: "Tech Arrives On Time",
+      description: "Your licensed, background-checked technician arrives in a clearly marked truck, fully stocked with hundreds of common parts."
+    },
+    {
+      number: "04",
+      icon: "clipboard",
+      title: "Honest Upfront Quote",
+      description: "We diagnose the problem and give you a clear written price before touching anything. You approve it — we proceed."
+    },
+    {
+      number: "05",
+      icon: "check",
+      title: "Fixed Right. Guaranteed.",
+      description: "We repair your AC correctly the first time. Same issue returns within 30 days? We come back and fix it free of charge."
+    }
+  ]
+} = Astro.props;
+
+const icons: Record<string, string> = {
+  phone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.52 2 2 0 0 1 3.6 1.36h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  truck: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+  clipboard: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+};
+---
+
+<section class="hiw-section" id="how-it-works">
+  <div class="hiw-container">
+
+    <!-- Header -->
+    <div class="hiw-header">
+      <span class="hiw-eyebrow">{eyebrow}</span>
+      <h2 class="hiw-heading">{heading}</h2>
+    </div>
+
+    <!-- Steps -->
+    <div class="hiw-steps">
+      {steps.map((step, i) => (
+        <div class="hiw-step" style={`--delay: ${i * 0.1}s`}>
+          <!-- Connector line (hidden on first step) -->
+          {i > 0 && <div class="hiw-connector" aria-hidden="true">
+            <svg viewBox="0 0 40 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 6 H32 M28 2 L36 6 L28 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>}
+
+          <!-- Card -->
+          <div class="hiw-card">
+            <div class="hiw-step-number">{step.number}</div>
+            <div class="hiw-icon-ring" set:html={icons[step.icon] ?? icons.check} />
+            <h3 class="hiw-step-title">{step.title}</h3>
+            <p class="hiw-step-desc">{step.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Bottom CTA -->
+    {phone && (
+      <div class="hiw-cta">
+        <p class="hiw-cta-label">Ready to get started? We pick up fast.</p>
+        <a href={`tel:${phone.replace(/\D/g,'')}`} class="hiw-cta-btn">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.52 2 2 0 0 1 3.6 1.36h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          Call {phone}
+        </a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+.hiw-section {
+  background: #f8fafc;
+  padding: 6rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hiw-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+.hiw-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.hiw-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+.hiw-eyebrow::before,
+.hiw-eyebrow::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1.5px;
+  background: var(--color-accent);
+  opacity: 0.5;
+}
+
+.hiw-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.2;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Steps row */
+.hiw-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  position: relative;
+}
+
+.hiw-step {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  animation: fadeInUp 0.5s ease both;
+  animation-delay: var(--delay, 0s);
+}
+
+/* Connecting arrow between cards */
+.hiw-connector {
+  flex-shrink: 0;
+  width: 40px;
+  margin-top: 32px;
+  color: #cbd5e1;
+}
+.hiw-connector svg {
+  width: 40px;
+  height: 12px;
+  display: block;
+}
+
+/* Card */
+.hiw-card {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+.hiw-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* Step number */
+.hiw-step-number {
+  font-family: var(--font-heading);
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+/* Icon ring */
+.hiw-icon-ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(246,138,30,0.1);
+  border: 1px solid rgba(246,138,30,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+.hiw-icon-ring svg {
+  width: 20px;
+  height: 20px;
+}
+
+.hiw-step-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.hiw-step-desc {
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Bottom CTA */
+.hiw-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.hiw-cta-label {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-style: italic;
+  margin: 0;
+}
+
+.hiw-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 14px 32px;
+  border-radius: 100px;
+  text-decoration: none;
+  box-shadow: 0 8px 28px rgba(246,138,30,0.4);
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+}
+.hiw-cta-btn:hover {
+  background: #e07a15;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(246,138,30,0.55);
+}
+
+/* Fade in animation */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .hiw-steps {
+    flex-direction: column;
+    gap: 0;
+  }
+  .hiw-step {
+    flex-direction: column;
+    width: 100%;
+  }
+  .hiw-connector {
+    /* Rotate arrow to point down on mobile */
+    transform: rotate(90deg);
+    margin: 4px auto;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  .hiw-card {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.5rem;
+  }
+  .hiw-step-number {
+    font-size: 1.8rem;
+    -webkit-text-stroke: 1px rgba(246,138,30,0.5);
+    min-width: 40px;
+  }
+  .hiw-icon-ring { display: none; } /* number is enough on mobile */
+}
+
+@media (max-width: 480px) {
+  .hiw-section { padding: 4rem 1rem; }
+  .hiw-cta { flex-direction: column; text-align: center; }
+}
+</style>

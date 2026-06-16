@@ -1,0 +1,113 @@
+---
+// DealerLogos — horizontal scrolling trust bar of dealer/certification badges
+// Pulls logos from client YAML dealerLogos array
+
+interface Props {
+  logos: { src: string; alt: string }[];
+  exclude?: string[];
+  theme?: 'light' | 'dark';
+}
+
+const { logos = [], exclude = [], theme = 'light' } = Astro.props;
+const filteredLogos = exclude.length > 0
+  ? logos.filter(l => !exclude.includes(l.alt))
+  : logos;
+---
+
+{filteredLogos.length > 0 && (
+  <section class="dealer-logos" data-theme={theme} aria-label="Certifications & Partnerships">
+    <div class="dealer-logos-inner">
+      <span class="dealer-eyebrow">Certified & Authorized Dealer</span>
+      <div class="dealer-strip">
+        {filteredLogos.map(logo => (
+          <div class="dealer-logo-item">
+            <img src={logo.src} alt={logo.alt} width="120" height="48" loading="lazy" decoding="async" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+.dealer-logos {
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 28px 0;
+  overflow: hidden;
+}
+.dealer-logos-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: center;
+}
+.dealer-eyebrow {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.35);
+  margin-bottom: 20px;
+}
+.dealer-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.dealer-logo-item {
+  flex-shrink: 0;
+}
+.dealer-logo-item img {
+  height: 50px;
+  width: auto;
+  max-width: 160px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.55;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+.dealer-logo-item img:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+</style>
+
+<style is:global>
+/* Dark Theme Overrides for integration into gradients (Forced Global to prevent scoping issues) */
+section.dealer-logos[data-theme="dark"] {
+  background: transparent !important;
+  border: none !important;
+  padding: 40px 0 0 0 !important;
+}
+section.dealer-logos[data-theme="dark"] .dealer-eyebrow {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+section.dealer-logos[data-theme="dark"] .dealer-logo-item img {
+  filter: grayscale(100%) brightness(200%) !important;
+  opacity: 0.85 !important;
+}
+section.dealer-logos[data-theme="dark"] .dealer-logo-item img:hover {
+  filter: grayscale(0%) brightness(100%) !important;
+  opacity: 1 !important;
+}
+</style>
+
+<style>
+
+@media (max-width: 768px) {
+  .dealer-strip {
+    gap: 24px;
+    justify-content: center;
+  }
+  .dealer-logo-item img {
+    height: 38px;
+    max-width: 120px;
+  }
+}
+</style>

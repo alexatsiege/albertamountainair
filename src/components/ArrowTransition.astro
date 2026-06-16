@@ -1,0 +1,171 @@
+---
+// ArrowTransition.astro — Air Rush page transition overlay
+---
+
+<div id="arrow-transition-overlay" aria-hidden="true">
+  <canvas id="arrow-transition-canvas"></canvas>
+</div>
+
+<style>
+  #arrow-transition-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease;
+  }
+  #arrow-transition-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+  }
+  #arrow-transition-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+</style>
+
+<script>
+(function () {
+  const overlay = document.getElementById('arrow-transition-overlay');
+  const canvas = document.getElementById('arrow-transition-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+  let raf: number;
+  let running = false;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function makeParticles() {
+    const count = Math.floor(window.innerWidth / 14);
+    return Array.from({ length: count }, (_, i) => ({
+      x: -60 - Math.random() * 300,
+      y: (i / count) * window.innerHeight * 1.2 - window.innerHeight * 0.1 + (Math.random() - 0.5) * 40,
+      speed: 18 + Math.random() * 22,
+      size: 8 + Math.random() * 14,
+      opacity: 0.35 + Math.random() * 0.65,
+      color: Math.random() > 0.72 ? '#f68a1e' : '#29b0e5',
+      wave: Math.random() * Math.PI * 2,
+    }));
+  }
+
+  function drawArrow(
+    x: number, y: number, size: number,
+    color: string, opacity: number
+  ) {
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.strokeStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = opacity > 0.7 ? 10 : 4;
+    ctx.lineWidth = size * 0.18;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x - size, y);
+    ctx.lineTo(x + size, y);
+    ctx.moveTo(x + size * 0.25, y - size * 0.45);
+    ctx.lineTo(x + size, y);
+    ctx.lineTo(x + size * 0.25, y + size * 0.45);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function runTransition(onComplete: () => void) {
+    resize();
+    running = true;
+    overlay!.classList.add('active');
+
+    const W = canvas.width;
+    const H = canvas.height;
+    const particles = makeParticles();
+    let t = 0;
+
+    // Also draw a dark wash that sweeps across
+    let washX = -W * 0.3;
+
+    cancelAnimationFrame(raf);
+
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Trailing dark wash
+      const washProgress = Math.min(washX / (W * 1.4), 1);
+      if (washX < W * 1.1) {
+        const grad = ctx.createLinearGradient(washX - W * 0.25, 0, washX + W * 0.05, 0);
+        grad.addColorStop(0, 'rgba(4,17,31,0)');
+        grad.addColorStop(0.4, 'rgba(4,17,31,0.92)');
+        grad.addColorStop(1, 'rgba(4,17,31,0.98)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, Math.min(washX + W * 0.06, W), H);
+      }
+
+      // Arrow particles
+      let allDone = true;
+      particles.forEach(p => {
+        p.x += p.speed;
+        p.y += Math.sin(t * 2 + p.wave) * 0.4;
+        const fade = Math.min(1, Math.max(0, (W - p.x) / (W * 0.3)));
+        drawArrow(p.x, p.y, p.size, p.color, p.opacity * Math.min(fade, 1));
+        if (p.x < W + 80) allDone = false;
+      });
+
+      washX += 28;
+      t += 0.016;
+
+      if (!allDone || washX < W * 1.2) {
+        raf = requestAnimationFrame(frame);
+      } else {
+        running = false;
+        onComplete();
+      }
+    }
+
+    frame();
+  }
+
+  function hideOverlay() {
+    overlay!.style.transition = 'opacity 0.3s ease';
+    overlay!.style.opacity = '0';
+    setTimeout(() => {
+      overlay!.classList.remove('active');
+      overlay!.style.opacity = '';
+      overlay!.style.transition = '';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      cancelAnimationFrame(raf);
+    }, 320);
+  }
+
+  // Hook into Astro view transitions
+  document.addEventListener('astro:before-preparation', () => {
+    resize();
+    runTransition(() => {});
+  });
+
+  document.addEventListener('astro:page-load', () => {
+    setTimeout(hideOverlay, 80);
+  });
+
+  // Fallback: hook regular link clicks for non-View-Transition pages
+  document.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest('a');
+    if (!target) return;
+    const href = target.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('tel:') || href.startsWith('mailto:') || target.getAttribute('target') === '_blank') return;
+    if (!document.startViewTransition) {
+      // Only run manually if View Transitions not supported
+      e.preventDefault();
+      resize();
+      runTransition(() => {
+        window.location.href = href;
+      });
+    }
+  });
+
+  window.addEventListener('resize', resize);
+})();
+</script>

@@ -1,0 +1,106 @@
+---
+// FooterPPC.astro — Simplified PPC landing page footer
+// No navigation links to eliminate exit paths.
+// Just business info, phone, and legal text.
+
+interface Props {
+  businessName: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+}
+
+const { businessName, phone, address, city, state, zip } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<footer class="ppc-footer">
+  <div class="ppc-footer-inner">
+
+    <!-- Left: Copyright + Address -->
+    <div class="ppc-footer-info">
+      <p class="ppc-footer-copyright">&copy; {year} {businessName}. All rights reserved.</p>
+      <p class="ppc-footer-address">{address}, {city}, {state} {zip}</p>
+      <p class="ppc-footer-address">Plumbing License: #5062 | Electrical License: #8320-A1</p>
+    </div>
+
+    <!-- Right: Phone CTA -->
+    <a href={`tel:${phone.replace(/\D/g, '')}`} class="ppc-footer-phone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.52 2 2 0 0 1 3.6 1.36h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21.73 16.92z"/>
+      </svg>
+      Call {phone}
+    </a>
+
+  </div>
+</footer>
+
+<style>
+.ppc-footer {
+  background: #111827;
+  border-top: 3px solid var(--color-primary);
+  padding: 24px 0;
+}
+
+.ppc-footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ppc-footer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ppc-footer-copyright {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+}
+
+.ppc-footer-address {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  margin: 0;
+}
+
+.ppc-footer-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 24px;
+  background: var(--color-primary);
+  border-radius: 9999px;
+  transition: all 200ms ease;
+}
+.ppc-footer-phone:hover {
+  background: var(--color-primary-dark, #1D4ED8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+}
+.ppc-footer-phone svg {
+  width: 16px; height: 16px; flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .ppc-footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+  .ppc-footer-info { align-items: center; }
+}
+</style>

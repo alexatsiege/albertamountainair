@@ -1,0 +1,10 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# ── URL structure rewrites ──────────────────────────────────────────
+# ── Global noindex header (belt-and-suspenders alongside meta tag) ──
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

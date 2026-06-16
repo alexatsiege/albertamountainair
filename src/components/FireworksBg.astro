@@ -1,0 +1,113 @@
+---
+// FireworksBg.astro — Red, White, and Blue canvas fireworks
+---
+<div class="fireworks-wrap" aria-hidden="true">
+  <canvas class="fireworks-canvas"></canvas>
+</div>
+
+<style>
+.fireworks-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1; /* Above blobs, below content */
+  overflow: hidden;
+}
+.fireworks-canvas {
+  width: 100%; height: 100%;
+  display: block; opacity: 0.8;
+}
+</style>
+
+<script>
+document.querySelectorAll('.fireworks-canvas').forEach((canvas: HTMLCanvasElement) => {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  let width = 0, height = 0;
+  function resize() {
+    width = canvas.parentElement!.clientWidth;
+    height = canvas.parentElement!.clientHeight;
+    canvas.width = width; canvas.height = height;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Red, White, and Blue
+  const colors = ['#DA1A32', '#FFFFFF', '#008BCC', '#E2E8F0', '#ff4d4d'];
+  
+  class Particle {
+    x: number; y: number; vx: number; vy: number;
+    life: number; decay: number; color: string; size: number;
+    
+    constructor(x: number, y: number) {
+      this.x = x; this.y = y;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 4 + 0.5;
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed;
+      this.life = 1.0;
+      this.decay = Math.random() * 0.015 + 0.01;
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.size = Math.random() * 2.5 + 1;
+    }
+    
+    update() {
+      this.x += this.vx; 
+      this.y += this.vy;
+      this.vy += 0.04; // Gentle gravity
+      this.life -= this.decay;
+    }
+    
+    draw() {
+      if(!ctx) return;
+      ctx.globalAlpha = Math.max(0, this.life);
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  let particles: Particle[] = [];
+  
+  function createExplosion(x: number, y: number) {
+    const count = Math.random() * 40 + 30;
+    for(let i=0; i<count; i++) particles.push(new Particle(x, y));
+  }
+
+  let animating = false;
+  let animId = 0;
+  let lastTime = 0;
+
+  function animate(t: number) {
+    if(!ctx || !animating) return;
+    animId = requestAnimationFrame(animate);
+    ctx.clearRect(0,0,width,height);
+    
+    // Spawn explosions randomly
+    if(t - lastTime > Math.random() * 2000 + 800) {
+      createExplosion(Math.random() * width, Math.random() * height * 0.7 + height * 0.1);
+      lastTime = t;
+    }
+    
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => { p.update(); p.draw(); });
+  }
+
+  const obs = new IntersectionObserver(([e]) => {
+    if(e.isIntersecting && !animating) {
+      animating = true;
+      lastTime = performance.now();
+      animId = requestAnimationFrame(animate);
+    } else if (!e.isIntersecting && animating) {
+      animating = false;
+      cancelAnimationFrame(animId);
+    }
+  }, { rootMargin: '200px' });
+  
+  obs.observe(canvas.parentElement!);
+});
+</script>

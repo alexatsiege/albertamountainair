@@ -1,0 +1,776 @@
+---
+// OWA Animation Preview Page — all 10 concepts
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Company — Animation Concepts Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #29b0e5; --blue-dark: #2d86c8; --orange: #f68a1e;
+      --bg: #04111f; --card-bg: #0a1e33; --text: #fff;
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; }
+
+    header {
+      text-align: center; padding: 60px 24px 40px;
+      border-bottom: 1px solid rgba(41,176,229,0.2);
+    }
+    header h1 { font-size: 2.8rem; font-weight: 900; color: var(--blue); }
+    header p { color: rgba(255,255,255,0.6); margin-top: 8px; font-size: 1.05rem; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+      gap: 32px; padding: 48px 40px;
+      max-width: 1400px; margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid rgba(41,176,229,0.15);
+      border-radius: 20px; overflow: hidden;
+    }
+    .card-demo {
+      position: relative; height: 300px; overflow: hidden;
+      background: #060f1c;
+    }
+    .card-label {
+      padding: 20px 24px;
+      border-top: 1px solid rgba(41,176,229,0.12);
+    }
+    .card-num {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 2px;
+      color: var(--orange); text-transform: uppercase; margin-bottom: 4px;
+    }
+    .card-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+    .card-desc { font-size: 0.85rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
+    /* ════════════════════════════════════
+       CONCEPT 1 — Scroll-Draw Arrow Border
+       ════════════════════════════════════ */
+    .c1-box {
+      position: absolute; inset: 30px;
+      background: rgba(41,176,229,0.05);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .c1-box span { font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,0.7); }
+    .c1-svg {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .c1-path {
+      fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .c1-orange { stroke: var(--orange); }
+    .c1-blue   { stroke: var(--blue); }
+
+    /* ════════════════════════════════════
+       CONCEPT 2 — Airflow Sweep Dividers
+       ════════════════════════════════════ */
+    .c2-wrap {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      justify-content: space-evenly; overflow: hidden;
+    }
+    .c2-lane {
+      display: flex; align-items: center; white-space: nowrap;
+      animation: c2-sweep 4s linear infinite;
+      opacity: 0.7;
+    }
+    .c2-lane:nth-child(2) { animation-duration: 5.5s; animation-delay: -1s; opacity: 0.45; }
+    .c2-lane:nth-child(3) { animation-duration: 3.5s; animation-delay: -2.5s; opacity: 0.3; }
+    .c2-lane:nth-child(4) { animation-duration: 6s; animation-delay: -0.5s; opacity: 0.5; }
+    .c2-lane:nth-child(5) { animation-duration: 4.5s; animation-delay: -3s; opacity: 0.35; }
+    .c2-chevron { font-size: 1.6rem; font-weight: 900; color: var(--blue); margin-right: 18px; }
+    .c2-lane:nth-child(even) .c2-chevron { color: var(--orange); }
+    @keyframes c2-sweep {
+      0% { transform: translateX(-60%); }
+      100% { transform: translateX(0%); }
+    }
+
+    /* ════════════════════════════════════
+       CONCEPT 3 — Hero Wind Vortex
+       ════════════════════════════════════ */
+    #c3-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* ════════════════════════════════════
+       CONCEPT 4 — Scroll Arrow River
+       ════════════════════════════════════ */
+    #c4-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .c4-label {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      text-align: center;
+    }
+    .c4-label p { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-top: 6px; }
+
+    /* ════════════════════════════════════
+       CONCEPT 5 — Pulsing Chevron Ring
+       ════════════════════════════════════ */
+    .c5-center {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .c5-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid var(--blue);
+      animation: c5-pulse 3s ease-out infinite;
+    }
+    .c5-ring:nth-child(1) { width: 80px; height: 80px; animation-delay: 0s; }
+    .c5-ring:nth-child(2) { width: 80px; height: 80px; animation-delay: 0.6s; border-color: var(--orange); }
+    .c5-ring:nth-child(3) { width: 80px; height: 80px; animation-delay: 1.2s; }
+    .c5-ring:nth-child(4) { width: 80px; height: 80px; animation-delay: 1.8s; border-color: var(--orange); }
+    .c5-core {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--blue); display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 900; color: #fff; z-index: 2;
+      box-shadow: 0 0 24px rgba(41,176,229,0.6);
+    }
+    @keyframes c5-pulse {
+      0%   { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(5); opacity: 0; }
+    }
+
+    /* ════════════════════════════════════
+       CONCEPT 6 — Particle Arrow Field
+       ════════════════════════════════════ */
+    #c6-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* ════════════════════════════════════
+       CONCEPT 7 — Air Duct Grid
+       ════════════════════════════════════ */
+    .c7-grid {
+      position: absolute; inset: 0;
+      display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr);
+      gap: 8px; padding: 20px;
+    }
+    .c7-duct {
+      border: 2px solid rgba(41,176,229,0.3);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative; background: rgba(41,176,229,0.04);
+    }
+    .c7-arrow {
+      position: absolute; white-space: nowrap;
+      font-size: 1.2rem; font-weight: 900;
+      color: var(--blue);
+      animation: c7-flow 2s linear infinite;
+    }
+    .c7-duct:nth-child(even) .c7-arrow { color: var(--orange); animation-direction: reverse; animation-duration: 2.8s; }
+    .c7-duct:nth-child(3n) .c7-arrow { animation-duration: 1.6s; }
+    @keyframes c7-flow {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* ════════════════════════════════════
+       CONCEPT 8 — Kinetic Arrow Wave
+       ════════════════════════════════════ */
+    #c8-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* ════════════════════════════════════
+       CONCEPT 9 — Neon Arrow Trail
+       ════════════════════════════════════ */
+    #c9-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; }
+    .c9-hint {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .c9-hint p { font-size: 0.85rem; color: rgba(255,255,255,0.35); }
+
+    /* ════════════════════════════════════
+       CONCEPT 10 — Blueprint HVAC Flow
+       ════════════════════════════════════ */
+    #c10-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Your Company — Motion Concepts</h1>
+  <p>10 animated background styles. Arrows &amp; airflow theme.</p>
+</header>
+
+<div class="grid">
+
+  <!-- CARD 1 -->
+  <div class="card">
+    <div class="card-demo" id="c1-demo">
+      <div class="c1-box">
+        <svg class="c1-svg" viewBox="0 0 460 260" preserveAspectRatio="none">
+          <!-- Orange top-left bracket -->
+          <path id="c1-p1" class="c1-path c1-orange"
+            d="M30,220 L30,40 Q30,30 40,30 L220,30" />
+          <!-- Arrow tip on orange -->
+          <polyline id="c1-p2" class="c1-path c1-orange" points="205,18 220,30 205,42" />
+          <!-- Blue bottom-right bracket -->
+          <path id="c1-p3" class="c1-path c1-blue"
+            d="M430,40 L430,220 Q430,230 420,230 L240,230" />
+          <!-- Arrow tip on blue -->
+          <polyline id="c1-p4" class="c1-path c1-blue" points="255,218 240,230 255,242" />
+        </svg>
+        <span>Section Content</span>
+      </div>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 01</div>
+      <div class="card-title">Scroll-Draw Arrow Border</div>
+      <div class="card-desc">SVG arrow brackets trace module edges on scroll — orange top-left, blue bottom-right.</div>
+    </div>
+  </div>
+
+  <!-- CARD 2 -->
+  <div class="card">
+    <div class="card-demo">
+      <div class="c2-wrap">
+        <div class="c2-lane"><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span></div>
+        <div class="c2-lane"><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span></div>
+        <div class="c2-lane"><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span></div>
+        <div class="c2-lane"><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span></div>
+        <div class="c2-lane"><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span><span class="c2-chevron">›</span></div>
+      </div>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 02</div>
+      <div class="card-title">Airflow Sweep Dividers</div>
+      <div class="card-desc">Rows of chevrons sweep across the screen at varying speeds — like gusts of air between sections.</div>
+    </div>
+  </div>
+
+  <!-- CARD 3 -->
+  <div class="card">
+    <div class="card-demo">
+      <canvas id="c3-canvas"></canvas>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 03</div>
+      <div class="card-title">Hero Wind Vortex</div>
+      <div class="card-desc">Radial arrows emanate outward from center and slowly rotate — like a turbine cross-section.</div>
+    </div>
+  </div>
+
+  <!-- CARD 4 -->
+  <div class="card">
+    <div class="card-demo">
+      <canvas id="c4-canvas"></canvas>
+      <div class="c4-label">
+        <p>Scroll to draw the path</p>
+      </div>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 04</div>
+      <div class="card-title">Scroll Arrow River</div>
+      <div class="card-desc">A glowing arrow river draws itself as you scroll — progress tied to your position on the page.</div>
+    </div>
+  </div>
+
+  <!-- CARD 5 -->
+  <div class="card">
+    <div class="card-demo">
+      <div class="c5-center">
+        <div class="c5-ring"></div>
+        <div class="c5-ring"></div>
+        <div class="c5-ring"></div>
+        <div class="c5-ring"></div>
+        <div class="c5-core">›</div>
+      </div>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 05</div>
+      <div class="card-title">Pulsing Chevron Ring</div>
+      <div class="card-desc">Concentric rings pulse outward from a CTA core — like a radar ping made of arrows.</div>
+    </div>
+  </div>
+
+  <!-- CARD 6 -->
+  <div class="card">
+    <div class="card-demo">
+      <canvas id="c6-canvas"></canvas>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 06</div>
+      <div class="card-title">Particle Arrow Field</div>
+      <div class="card-desc">Hundreds of tiny arrow particles drift right — like visualizing airflow in a wind tunnel.</div>
+    </div>
+  </div>
+
+  <!-- CARD 7 -->
+  <div class="card">
+    <div class="card-demo">
+      <div class="c7-grid">
+        <!-- 20 duct cells -->
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+        <div class="c7-duct"><span class="c7-arrow">›  ›  ›</span></div>
+      </div>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 07</div>
+      <div class="card-title">Air Duct Grid</div>
+      <div class="card-desc">Blueprint-style duct grid — arrows flow through each cell like an HVAC system diagram.</div>
+    </div>
+  </div>
+
+  <!-- CARD 8 -->
+  <div class="card">
+    <div class="card-demo">
+      <canvas id="c8-canvas"></canvas>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 08</div>
+      <div class="card-title">Kinetic Arrow Wave</div>
+      <div class="card-desc">A sine wave of arrows ripples across the screen — arrows bob up and down while cruising right.</div>
+    </div>
+  </div>
+
+  <!-- CARD 9 -->
+  <div class="card">
+    <div class="card-demo" style="position:relative;">
+      <canvas id="c9-canvas"></canvas>
+      <div class="c9-hint"><p>Move your mouse here</p></div>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 09</div>
+      <div class="card-title">Neon Arrow Trail</div>
+      <div class="card-desc">Your cursor leaves a glowing trail of directional arrows — interactive and surprising.</div>
+    </div>
+  </div>
+
+  <!-- CARD 10 -->
+  <div class="card">
+    <div class="card-demo">
+      <canvas id="c10-canvas"></canvas>
+    </div>
+    <div class="card-label">
+      <div class="card-num">Concept 10</div>
+      <div class="card-title">Blueprint HVAC Flow</div>
+      <div class="card-desc">Technical blueprint showing animated air circulation — pipes, ducts and flow arrows like an engineer's drawing.</div>
+    </div>
+  </div>
+
+</div><!-- /grid -->
+
+<script>
+// ═══════════════════════════════════════════
+// CONCEPT 1 — Scroll-Draw Arrow Border
+// ═══════════════════════════════════════════
+(function() {
+  const paths = ['c1-p1','c1-p2','c1-p3','c1-p4'];
+  paths.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const len = el.getTotalLength ? el.getTotalLength() : 200;
+    el.style.strokeDasharray = len;
+    el.style.strokeDashoffset = len;
+    el.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+  });
+  const demo = document.getElementById('c1-demo');
+  const io = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      paths.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        setTimeout(() => { el.style.strokeDashoffset = '0'; }, i * 150);
+      });
+      io.disconnect();
+    }
+  });
+  if (demo) io.observe(demo);
+})();
+
+// ═══════════════════════════════════════════
+// CONCEPT 3 — Wind Vortex
+// ═══════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('c3-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, raf;
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  const rings = [
+    { r: 40, n: 6, speed: 0.004, color: '#29b0e5', opacity: 0.8 },
+    { r: 80, n: 10, speed: 0.003, color: '#f68a1e', opacity: 0.6 },
+    { r: 125, n: 14, speed: 0.002, color: '#29b0e5', opacity: 0.45 },
+    { r: 170, n: 18, speed: 0.0015, color: '#f68a1e', opacity: 0.3 },
+  ];
+  let t = 0;
+  function drawArrow(ctx, x, y, angle, size, color, opacity) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle + Math.PI / 2);
+    ctx.globalAlpha = opacity;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, -size);
+    ctx.lineTo(0, size);
+    ctx.moveTo(-size * 0.5, size * 0.2);
+    ctx.lineTo(0, size);
+    ctx.lineTo(size * 0.5, size * 0.2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2;
+    rings.forEach(ring => {
+      for (let i = 0; i < ring.n; i++) {
+        const baseAngle = (i / ring.n) * Math.PI * 2;
+        const angle = baseAngle + t * ring.speed * 1000;
+        const x = cx + Math.cos(angle) * ring.r;
+        const y = cy + Math.sin(angle) * ring.r;
+        drawArrow(ctx, x, y, angle, 8, ring.color, ring.opacity);
+      }
+    });
+    t += 0.016;
+    raf = requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ═══════════════════════════════════════════
+// CONCEPT 4 — Scroll Arrow River (animated demo)
+// ═══════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('c4-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  let progress = 0, dir = 1;
+  function getPath(w, h) {
+    const p = new Path2D();
+    p.moveTo(0, h * 0.6);
+    p.bezierCurveTo(w * 0.25, h * 0.8, w * 0.5, h * 0.1, w * 0.75, h * 0.5);
+    p.bezierCurveTo(w * 0.88, h * 0.7, w, h * 0.4, w, h * 0.4);
+    return p;
+  }
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    // Draw faint full path
+    ctx.save();
+    ctx.strokeStyle = 'rgba(41,176,229,0.12)';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([8, 12]);
+    ctx.beginPath();
+    ctx.moveTo(0, H * 0.6);
+    ctx.bezierCurveTo(W * 0.25, H * 0.8, W * 0.5, H * 0.1, W * 0.75, H * 0.5);
+    ctx.bezierCurveTo(W * 0.88, H * 0.7, W, H * 0.4, W, H * 0.4);
+    ctx.stroke();
+    ctx.restore();
+    // Animated glowing head
+    const steps = 80;
+    const drawn = Math.floor(progress * steps);
+    for (let i = 0; i < drawn; i++) {
+      const t0 = i / steps, t1 = (i + 1) / steps;
+      const pt0 = getPointOnCurve(W, H, t0);
+      const pt1 = getPointOnCurve(W, H, t1);
+      const alpha = (i / drawn);
+      ctx.strokeStyle = `rgba(41,176,229,${alpha * 0.9})`;
+      ctx.lineWidth = 3 + alpha * 2;
+      ctx.shadowColor = '#29b0e5';
+      ctx.shadowBlur = alpha * 16;
+      ctx.beginPath();
+      ctx.moveTo(pt0.x, pt0.y);
+      ctx.lineTo(pt1.x, pt1.y);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    // Arrow head at tip
+    if (drawn > 1) {
+      const tip = getPointOnCurve(W, H, drawn / steps);
+      const prev = getPointOnCurve(W, H, (drawn - 1) / steps);
+      const angle = Math.atan2(tip.y - prev.y, tip.x - prev.x);
+      ctx.save();
+      ctx.translate(tip.x, tip.y);
+      ctx.rotate(angle);
+      ctx.fillStyle = '#29b0e5';
+      ctx.shadowColor = '#29b0e5';
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.moveTo(12, 0);
+      ctx.lineTo(-8, -7);
+      ctx.lineTo(-8, 7);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+    progress += dir * 0.004;
+    if (progress > 1) dir = -1;
+    if (progress < 0) dir = 1;
+    requestAnimationFrame(frame);
+  }
+  function getPointOnCurve(w, h, t) {
+    // 2 bezier segments joined
+    let x, y;
+    if (t <= 0.5) {
+      const s = t * 2;
+      x = cubicBezier(0, w*0.25, w*0.5, w*0.75, s);
+      y = cubicBezier(h*0.6, h*0.8, h*0.1, h*0.5, s);
+    } else {
+      const s = (t - 0.5) * 2;
+      x = cubicBezier(w*0.75, w*0.88, w, w, s);
+      y = cubicBezier(h*0.5, h*0.7, h*0.4, h*0.4, s);
+    }
+    return { x, y };
+  }
+  function cubicBezier(p0, p1, p2, p3, t) {
+    const mt = 1 - t;
+    return mt*mt*mt*p0 + 3*mt*mt*t*p1 + 3*mt*t*t*p2 + t*t*t*p3;
+  }
+  frame();
+})();
+
+// ═══════════════════════════════════════════
+// CONCEPT 6 — Particle Arrow Field
+// ═══════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('c6-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  const particles = Array.from({ length: 80 }, () => ({
+    x: Math.random() * 600, y: Math.random() * 300,
+    speed: 0.5 + Math.random() * 1.5,
+    size: 5 + Math.random() * 10,
+    opacity: 0.2 + Math.random() * 0.6,
+    color: Math.random() > 0.7 ? '#f68a1e' : '#29b0e5'
+  }));
+  function drawArrowParticle(p) {
+    ctx.save();
+    ctx.globalAlpha = p.opacity;
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.translate(p.x, p.y);
+    ctx.beginPath();
+    ctx.moveTo(-p.size, 0); ctx.lineTo(p.size, 0);
+    ctx.moveTo(p.size * 0.3, -p.size * 0.4); ctx.lineTo(p.size, 0); ctx.lineTo(p.size * 0.3, p.size * 0.4);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function frame() {
+    ctx.fillStyle = 'rgba(6,15,28,0.3)';
+    ctx.fillRect(0, 0, W, H);
+    particles.forEach(p => {
+      drawArrowParticle(p);
+      p.x += p.speed;
+      if (p.x > W + 20) { p.x = -20; p.y = Math.random() * H; }
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ═══════════════════════════════════════════
+// CONCEPT 8 — Kinetic Arrow Wave
+// ═══════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('c8-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  let t = 0;
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    const rows = 3, spacing = H / (rows + 1);
+    for (let row = 0; row < rows; row++) {
+      const baseY = spacing * (row + 1);
+      const cols = 12;
+      for (let col = 0; col < cols; col++) {
+        const x = (col / cols) * W + (t * 60 % (W / cols));
+        const wave = Math.sin(t * 2 + col * 0.8 + row * 1.2) * 30;
+        const y = baseY + wave;
+        const angle = Math.atan2(
+          Math.sin(t * 2 + (col + 0.1) * 0.8 + row * 1.2) * 30 - wave,
+          W / cols
+        );
+        const isOrange = (row + col) % 3 === 0;
+        const alpha = 0.3 + 0.4 * Math.abs(Math.sin(t + col * 0.5));
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = isOrange ? '#f68a1e' : '#29b0e5';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        const s = 14;
+        ctx.beginPath();
+        ctx.moveTo(-s, 0); ctx.lineTo(s, 0);
+        ctx.moveTo(s * 0.3, -s * 0.45); ctx.lineTo(s, 0); ctx.lineTo(s * 0.3, s * 0.45);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+    t += 0.016;
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ═══════════════════════════════════════════
+// CONCEPT 9 — Neon Arrow Trail
+// ═══════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('c9-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  const trail = [];
+  canvas.parentElement.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    trail.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, t: Date.now() });
+    if (trail.length > 30) trail.shift();
+  });
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 1; i < trail.length; i++) {
+      const p0 = trail[i - 1], p1 = trail[i];
+      const age = (Date.now() - p1.t) / 800;
+      if (age > 1) continue;
+      const alpha = 1 - age;
+      const angle = Math.atan2(p1.y - p0.y, p1.x - p0.x);
+      const s = 10 * alpha;
+      ctx.save();
+      ctx.translate(p1.x, p1.y);
+      ctx.rotate(angle);
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = i % 2 === 0 ? '#29b0e5' : '#f68a1e';
+      ctx.shadowColor = i % 2 === 0 ? '#29b0e5' : '#f68a1e';
+      ctx.shadowBlur = 12;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-s, 0); ctx.lineTo(s, 0);
+      ctx.moveTo(s * 0.3, -s * 0.5); ctx.lineTo(s, 0); ctx.lineTo(s * 0.3, s * 0.5);
+      ctx.stroke();
+      ctx.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ═══════════════════════════════════════════
+// CONCEPT 10 — Blueprint HVAC Flow
+// ═══════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('c10-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  let t = 0;
+  // Define duct segments
+  function getDucts(w, h) {
+    return [
+      { x1: w*0.1, y1: h*0.3, x2: w*0.4, y2: h*0.3 },
+      { x1: w*0.4, y1: h*0.3, x2: w*0.4, y2: h*0.7 },
+      { x1: w*0.4, y1: h*0.7, x2: w*0.9, y2: h*0.7 },
+      { x1: w*0.6, y1: h*0.3, x2: w*0.9, y2: h*0.3 },
+      { x1: w*0.6, y1: h*0.3, x2: w*0.6, y2: h*0.5 },
+    ];
+  }
+  function drawDuctArrow(x, y, angle, alpha, color) {
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(angle);
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.shadowColor = color; ctx.shadowBlur = 8;
+    ctx.lineWidth = 2; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-8, 0); ctx.lineTo(8, 0);
+    ctx.moveTo(2, -5); ctx.lineTo(8, 0); ctx.lineTo(2, 5);
+    ctx.stroke();
+    ctx.restore();
+  }
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    // Grid
+    ctx.strokeStyle = 'rgba(41,176,229,0.06)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    const ducts = getDucts(W, H);
+    // Draw ducts
+    ducts.forEach(d => {
+      ctx.strokeStyle = 'rgba(41,176,229,0.35)';
+      ctx.lineWidth = 12; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(d.x1, d.y1); ctx.lineTo(d.x2, d.y2); ctx.stroke();
+      ctx.strokeStyle = 'rgba(6,15,28,0.8)';
+      ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.moveTo(d.x1, d.y1); ctx.lineTo(d.x2, d.y2); ctx.stroke();
+    });
+    // Animate arrows along ducts
+    ducts.forEach((d, di) => {
+      const dx = d.x2 - d.x1, dy = d.y2 - d.y1;
+      const len = Math.sqrt(dx*dx + dy*dy);
+      const angle = Math.atan2(dy, dx);
+      const spacing = 40;
+      const count = Math.floor(len / spacing);
+      const offset = (t * 40 + di * 15) % spacing;
+      for (let i = 0; i <= count; i++) {
+        const dist = i * spacing + offset;
+        if (dist > len) break;
+        const px = d.x1 + (dx / len) * dist;
+        const py = d.y1 + (dy / len) * dist;
+        const fade = Math.sin((dist / len) * Math.PI);
+        const color = di % 2 === 0 ? '#29b0e5' : '#f68a1e';
+        drawDuctArrow(px, py, angle, fade * 0.9, color);
+      }
+    });
+    // Corner joints
+    [[W*0.4,H*0.3],[W*0.4,H*0.7],[W*0.6,H*0.3]].forEach(([x,y]) => {
+      ctx.beginPath();
+      ctx.arc(x, y, 7, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(41,176,229,0.6)';
+      ctx.fill();
+    });
+    t += 0.016;
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>

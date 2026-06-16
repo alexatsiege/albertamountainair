@@ -1,0 +1,82 @@
+# ════════════════════════════════════════════
+# CLIENT INTAKE FORM — Anti Gravity Website Builder
+# ════════════════════════════════════════════
+# Fill out EVERY field below.
+# Then copy this file to:
+#   src/content/clients/YOUR-CLIENT-SLUG.yaml
+# Replace YOUR-CLIENT-SLUG with a lowercase-dashed version of the business name
+# e.g. "Smith Plumbing" → smith-plumbing
+
+# ── 1. Business Info ─────────────────────────────────────
+businessName: "Business Name Here"
+phone: "(555) 000-0000"
+address: "123 Main Street"
+city: "City"
+state: "ST"
+zip: "00000"
+email: "info@yourdomain.com"
+siteUrl: "https://yourdomain.com"
+
+yearFounded: 2010
+schemaDescription: "Brief description of the business for Google."
+
+# ── 2. Brand ─────────────────────────────────────────────
+# Primary brand color (used in header, buttons, hero overlay)
+colorPrimary: "#2563EB"
+# Slightly darker version of above (hover states)
+colorPrimaryDark: "#1D4ED8"
+# Accent / CTA button color — usually amber/orange/yellow
+colorAccent: "#F59E0B"
+
+# ── 3. Navigation ────────────────────────────────────────
+navCTA: "Get a Free Quote"
+navCtaUrl: "/contact"
+
+# ── 4. Images ────────────────────────────────────────────
+# Drop all images into: public/_assets/
+# Then fill in the filenames below.
+truckSrc: "/_assets/TRUCK-IMAGE.png"
+techCutout: "/_assets/TECH-CUTOUT.webp"
+# For the service area Google Map — get embed URL from:
+# Google Maps → Share → Embed a map → copy src="" URL
+mapEmbedUrl: "https://www.google.com/maps/embed?pb=..."
+
+# ── 5. Google / Reviews ──────────────────────────────────
+googleRating: 4.9
+googleReviewCount: 150
+googlePlaceId: ""
+
+# ── 6. Social ────────────────────────────────────────────
+facebook: "https://facebook.com/PAGE"
+instagram: "https://instagram.com/HANDLE"
+
+# ── 7. Services List ─────────────────────────────────────
+# These populate the Services Grid and nav dropdown.
+# slug must match the page filename (without the client prefix)
+services:
+  - name: "Service One"
+    slug: "service-one-city"
+    tag: "Most Popular"
+  - name: "Service Two"
+    slug: "service-two-city"
+  - name: "Service Three"
+    slug: "service-three-city"
+    tag: "24/7"
+
+# ── 8. Service Areas ─────────────────────────────────────
+# These populate the Service Area map section and footer.
+serviceAreas:
+  - "City 1"
+  - "City 2"
+  - "City 3"
+  - "City 4"
+
+# ── 9. Global Section Copy ───────────────────────────────
+servicesEyebrow: "What We Offer"
+servicesHeading: "Services You Can Count On"
+reviewsHeading: "Real Reviews from Real Customers"
+ctaHeading: "Ready to Get Started?"
+ctaSubheading: "Same-day service available. Call now or book online."
+
+# ── Footer ───────────────────────────────────────────────
+tagline: "Serving the community with honest, reliable service."

@@ -1,0 +1,338 @@
+---
+import SectionDivider from './SectionDivider.astro';
+
+interface Activity {
+  serviceType: string;
+  location: string;
+  zipCode: string;
+  timeAgo: string;
+}
+
+interface Props {
+  heading?: string;
+  activities: Activity[];
+}
+
+const { heading = "Recent Service Activity", activities } = Astro.props;
+---
+
+<section class="recent-activity-section section">
+  <div class="ra-bg-orb ra-orb-1" aria-hidden="true"></div>
+  <div class="ra-bg-orb ra-orb-2" aria-hidden="true"></div>
+  
+  <div class="container relative-z">
+    <div class="header">
+      <span class="eyebrow pulse">Live Dispatch Feed</span>
+      <h2 class="heading-lg banner-title">{heading}</h2>
+    </div>
+
+    <div class="activity-grid">
+      {activities.map((activity) => (
+        <div class="activity-card">
+          <!-- Background map pattern aesthetic -->
+          <div class="bg-pattern" aria-hidden="true">
+            <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10,10 L190,190 M10,50 L150,190 M50,10 L190,150 M10,90 L110,190 M90,10 L190,110 M10,130 L70,190 M130,10 L190,70" stroke="currentColor" stroke-width="2" fill="none" opacity="0.05" />
+            </svg>
+          </div>
+
+          <div class="card-header">
+            <div class="badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              Verified Local Repair
+            </div>
+            <div class="time-stamp">{activity.timeAgo}</div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="service-type">{activity.serviceType}</h3>
+            
+            <div class="location-wrapper">
+              <div class="pin-container">
+                <div class="pin-pulse"></div>
+                <svg class="pin-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
+              <div class="location-details">
+                <span class="neighborhood">{activity.location}</span>
+                <span class="zip">{activity.zipCode}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Wavy bottom edge to blend into next section natively -->
+  <div class="ra-wave-bottom" aria-hidden="true">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,20 C120,60 240,0 360,30 C480,60 600,10 720,35 C840,60 960,5 1080,30 C1200,55 1320,10 1440,25 L1440,80 L0,80 Z" fill="var(--color-bg, #ffffff)" />
+    </svg>
+  </div>
+</section>
+
+<style>
+  .recent-activity-section {
+    background: linear-gradient(135deg,
+      rgba(246, 138, 30, 0.98) 0%,
+      rgba(235, 100, 20, 0.95) 60%,
+      rgba(215, 80, 15, 0.98) 100%);
+    padding: var(--space-2xl) 0 calc(var(--space-2xl) + 40px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .recent-activity-section::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.8) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.1;
+    pointer-events: none;
+    animation: drift 60s linear infinite;
+  }
+
+  /* Ambient glow orbs */
+  .ra-bg-orb {
+    position: absolute; border-radius: 50%; pointer-events: none; filter: blur(80px);
+  }
+  .ra-orb-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+    top: -200px; left: -150px;
+  }
+  .ra-orb-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    bottom: -150px; right: -100px;
+  }
+
+  .ra-wave-bottom {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%;
+    height: 6vw; min-height: 40px; max-height: 80px;
+    line-height: 0; z-index: 2;
+  }
+  .ra-wave-bottom svg { display: block; width: 100%; height: 100%; }
+
+  .relative-z {
+    position: relative;
+    z-index: 3;
+  }
+
+  @keyframes drift {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(40px); }
+  }
+
+  .header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto calc(var(--space-xl) + 2rem);
+    position: relative;
+    z-index: 2;
+  }
+  
+  .eyebrow.pulse {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-left: 1.5rem;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .eyebrow.pulse::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background-color: #10B981; /* Green live dot */
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8);
+    animation: pulse-green 2s infinite cubic-bezier(0.66, 0, 0, 1);
+  }
+
+  @keyframes pulse-green {
+    to { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  }
+
+  .banner-title {
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .activity-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (min-width: 768px) {
+    .activity-grid {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 3.5rem;
+    }
+  }
+
+  .activity-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(10px);
+    border: none;
+    border-radius: calc(var(--radius-lg) + 0.5rem);
+    padding: var(--space-xl);
+    position: relative;
+    box-shadow: 0 15px 40px -10px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .activity-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--color-accent), var(--color-primary));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .activity-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.4);
+  }
+
+  .activity-card:hover::before {
+    opacity: 1;
+  }
+
+  .bg-pattern {
+    position: absolute;
+    bottom: -15px;
+    right: -15px;
+    z-index: -1;
+    color: var(--color-primary);
+    transform: scale(1);
+    transition: transform 0.5s ease;
+  }
+
+  .activity-card:hover .bg-pattern {
+    transform: scale(1.1) rotate(-5deg);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px dashed rgba(0, 0, 0, 0.05);
+    padding-bottom: var(--space-md);
+    margin-bottom: 0.25rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.70rem;
+    font-weight: 800;
+    color: var(--color-accent);
+    background-color: color-mix(in srgb, var(--color-accent) 10%, transparent);
+    padding: 0.35rem 0.75rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .time-stamp {
+    font-family: 'Inter', monospace;
+    font-size: 0.80rem;
+    font-weight: 600;
+    color: #94A3B8;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .service-type {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .location-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    color: var(--color-primary);
+    margin-top: 0.5rem;
+  }
+
+  .pin-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.15rem;
+  }
+
+  .pin-icon {
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+  
+  .pin-pulse {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-color: var(--color-primary);
+    border-radius: 50%;
+    opacity: 0.2;
+    z-index: 1;
+    animation: pin-ping 2s infinite ease-out;
+  }
+
+  @keyframes pin-ping {
+    0% { transform: scale(0.5); opacity: 0.5; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+
+  .location-details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .neighborhood {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  .zip {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #64748B;
+  }
+</style>

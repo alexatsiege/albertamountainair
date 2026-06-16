@@ -1,0 +1,459 @@
+---
+// Header.astro — Exact match of v1 header-preview.html
+// Floating card, 2-row grid, angled logo column, collapsing top bar on scroll
+import { Image } from 'astro:assets';
+
+interface Props {
+  businessName: string;
+  phone: string;
+  navCTA: string;
+  navCtaUrl: string;
+  services: Array<{ name: string; slug: string }>;
+  address?: string;
+  city?: string;
+  state?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  logoSrc?: string;
+}
+
+const {
+  businessName, phone, navCTA, navCtaUrl, services,
+  address, city, state, facebook, instagram, youtube, logoSrc
+} = Astro.props;
+---
+
+<!-- HEADER WRAPPER (Floating) -->
+<div class="header-wrapper" id="header-wrapper">
+  <div class="header-container">
+
+    <!-- DESKTOP: Two-row grid header -->
+    <div class="header-grid-wrapper">
+      <div class="header-grid">
+
+        <!-- LOGO COLUMN (spans both rows, primary bg + angled edge) -->
+        <div class="logo-column">
+          <a href="/" class="header-logo">
+            <div class="logo-icon">
+              {logoSrc
+                ? <img src={logoSrc} alt={`${businessName} logo`} />
+                : <span class="logo-initial">{businessName.charAt(0)}</span>
+              }
+            </div>
+            {!logoSrc && <span class="logo-text">{businessName}</span>}
+          </a>
+        </div>
+
+        <!-- TOP BAR (row 1, right of logo) -->
+        <div class="top-bar">
+          <div class="top-bar-left">
+            ⭐ Trusted by 500+ homeowners
+          </div>
+          <div class="top-bar-right">
+            {address && city && state && (
+              <span class="top-bar-address">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {address}, {city}, {state}
+              </span>
+            )}
+            {(facebook || instagram || youtube) && (
+              <div class="top-bar-social">
+                {facebook && (
+                  <a href={facebook} target="_blank" rel="noopener" aria-label="Facebook">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                  </a>
+                )}
+                {instagram && (
+                  <a href={instagram} target="_blank" rel="noopener" aria-label="Instagram">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                    </svg>
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <!-- MAIN NAV (row 2, right of logo) -->
+        <nav class="main-nav" aria-label="Main navigation">
+          <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="#services">Services</a>
+            <a href="/about">About Us</a>
+            <a href="/contact">Contact</a>
+          </div>
+          <div class="nav-right">
+            <a href={`tel:${phone.replace(/\D/g, '')}`} class="header-phone">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+              </svg>
+              {phone}
+            </a>
+            <a href={navCtaUrl} class="btn btn-primary">{navCTA}</a>
+          </div>
+        </nav>
+
+      </div>
+    </div>
+
+    <!-- MOBILE: Simple single-row header -->
+    <div class="mobile-header">
+      <a href="/" class="header-logo">
+        <div class="logo-icon mobile-logo-icon">
+          {logoSrc
+            ? <img src={logoSrc} alt={`${businessName} logo`} />
+            : <span class="logo-initial">{businessName.charAt(0)}</span>
+          }
+        </div>
+        {!logoSrc && <span class="logo-text mobile-logo-text">{businessName}</span>}
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- MOBILE MENU OVERLAY -->
+<div class="mobile-menu" id="mobile-menu" role="dialog" aria-label="Mobile navigation">
+  <nav class="mobile-menu-nav">
+    <a href="/">
+      Home
+      <span class="mobile-chevron">›</span>
+    </a>
+    <button class="mobile-dropdown-trigger" aria-expanded="false">
+      Services
+      <span class="mobile-chevron">›</span>
+    </button>
+    <div class="mobile-dropdown">
+      {services.map(s => (
+        <a href={s.slug ? `/${s.slug}` : '#'}>{s.name}</a>
+      ))}
+    </div>
+    <a href="/about">
+      About Us
+      <span class="mobile-chevron">›</span>
+    </a>
+    <a href="/contact">
+      Contact
+      <span class="mobile-chevron">›</span>
+    </a>
+  </nav>
+  <div class="mobile-menu-footer">
+    <a href={`tel:${phone.replace(/\D/g, '')}`} class="mobile-menu-phone">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+      </svg>
+      {phone}
+    </a>
+    <a href={navCtaUrl} class="mobile-menu-cta">{navCTA}</a>
+  </div>
+</div>
+
+<style>
+/* ── Variables (local, matches v1) ── */
+.header-wrapper {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  padding: 8px 16px 0;
+  transition: padding 250ms ease;
+}
+.header-wrapper.is-scrolled { padding-top: 0; }
+
+.header-container {
+  max-width: 1400px; margin: 0 auto;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+  transition: all 250ms ease;
+}
+.header-wrapper.is-scrolled .header-container {
+  border-radius: 0 0 0.75rem 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+}
+
+/* ── Two-row grid ── */
+.header-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: auto auto;
+}
+
+/* ── Logo column (spans both rows) ── */
+.logo-column {
+  grid-row: 1 / 3;
+  grid-column: 1;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px 24px;
+  position: relative; z-index: 2;
+  border-right: 1px solid rgba(0,0,0,0.06);
+}
+/* Angled edge */
+.logo-column::after {
+  content: '';
+  position: absolute; top: 0; right: -30px; bottom: 0;
+  width: 60px;
+  background: #fff;
+  transform: skewX(-12deg);
+  z-index: -1;
+  border-right: 1px solid rgba(0,0,0,0.06);
+}
+
+.header-logo {
+  display: flex; align-items: center; gap: 10px;
+  color: white; text-decoration: none; z-index: 2;
+}
+.logo-icon {
+  height: 64px;
+  width: auto;
+  max-width: 212px;
+  flex-shrink: 0;
+  background: transparent;
+  display: flex; align-items: center; justify-content: flex-start;
+  transition: height 250ms ease;
+}
+.header-wrapper.is-scrolled .logo-icon {
+  height: 48px;
+}
+.logo-icon img { width: auto; height: 100%; max-width: 100%; object-fit: contain; display: block; }
+.logo-initial {
+  width: 52px; height: 52px;
+  background: rgba(0,0,0,0.04);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-heading); font-size: 1.4rem; font-weight: 900;
+  color: var(--color-primary);
+}
+.logo-text {
+  font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700;
+  color: var(--color-primary); white-space: nowrap;
+}
+
+/* ── Top bar ── */
+.top-bar {
+  grid-row: 1; grid-column: 2;
+  background: var(--color-primary);
+  padding: 6px 24px 6px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.75rem; color: white;
+  overflow: hidden; max-height: 34px;
+  transition: padding 250ms ease;
+}
+.header-wrapper.is-scrolled .top-bar {
+  padding-top: 3px; padding-bottom: 3px;
+}
+.top-bar-left { font-weight: 500; opacity: 0.95; }
+.top-bar-right { display: flex; align-items: center; gap: 1rem; }
+.top-bar-address { display: flex; align-items: center; gap: 5px; font-weight: 500; opacity: 0.9; }
+.top-bar-social { display: flex; align-items: center; gap: 10px; padding-left: 0.75rem; border-left: 1px solid rgba(255,255,255,0.3); }
+.top-bar-social a { color: white; opacity: 0.8; transition: opacity 150ms ease; display: flex; text-decoration: none; }
+.top-bar-social a:hover { opacity: 1; }
+
+/* ── Main nav ── */
+.main-nav {
+  grid-row: 2; grid-column: 2;
+  background: var(--color-bg, #fff);
+  padding: 0 24px 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+  transition: height 250ms ease;
+}
+.header-wrapper.is-scrolled .main-nav { height: 48px; }
+
+.nav-links { display: flex; align-items: center; gap: 1.5rem; }
+.nav-links a {
+  font-size: 0.875rem; font-weight: 500; color: var(--color-text, #1A1A2E);
+  text-decoration: none; transition: color 150ms ease;
+  position: relative; text-transform: uppercase; letter-spacing: 0.025em;
+}
+.nav-links a:hover { color: var(--color-primary); }
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0;
+  width: 0; height: 2px; background: var(--color-primary);
+  transition: width 250ms ease; border-radius: 1px;
+}
+.nav-links a:hover::after { width: 100%; }
+
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+.header-phone {
+  font-size: 0.875rem; font-weight: 600; color: var(--color-text, #1A1A2E);
+  display: flex; align-items: center; gap: 6px; text-decoration: none;
+  transition: color 150ms ease;
+}
+.header-phone:hover { color: var(--color-primary); }
+.header-phone svg { color: var(--color-primary); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 10px 22px;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 0.875rem; font-weight: 600;
+  border: none; border-radius: 9999px;
+  cursor: pointer; transition: all 250ms ease; text-decoration: none;
+}
+.btn-primary { background: var(--color-primary); color: white; }
+.btn-primary:hover { background: var(--color-primary-dark, #1D4ED8); transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07); }
+
+/* ── Hamburger ── */
+.hamburger {
+  display: none; flex-direction: column; justify-content: center;
+  align-items: center; width: 40px; height: 40px;
+  background: none; border: none; cursor: pointer; z-index: 1001; gap: 6px;
+}
+.hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--color-text, #1A1A2E); transition: all 250ms ease; border-radius: 1px;
+}
+.hamburger.is-active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
+.hamburger.is-active span:nth-child(2) { opacity: 0; }
+.hamburger.is-active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
+
+/* ── Mobile menu overlay ── */
+.mobile-menu {
+  position: fixed; inset: 0;
+  background: var(--color-bg, #fff); z-index: 1000;
+  display: flex; flex-direction: column;
+  padding: 90px 1.5rem 2rem;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.mobile-menu.is-open { opacity: 1; visibility: visible; }
+
+.mobile-menu-nav { flex: 1; display: flex; flex-direction: column; }
+.mobile-menu-nav a,
+.mobile-menu-nav .mobile-dropdown-trigger {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-heading, 'Outfit', sans-serif); font-size: 1.5rem;
+  font-weight: 600; color: var(--color-text, #1A1A2E);
+  padding: 1rem 0; border-bottom: 1px solid var(--color-border, #E5E7EB);
+  text-decoration: none; cursor: pointer;
+  background: none; border-top: none; border-left: none; border-right: none;
+  width: 100%; text-align: left;
+  opacity: 0; transform: translateX(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s ease;
+}
+.mobile-menu.is-open .mobile-menu-nav a,
+.mobile-menu.is-open .mobile-menu-nav .mobile-dropdown-trigger { opacity: 1; transform: translateX(0); }
+.mobile-menu.is-open .mobile-menu-nav > *:nth-child(1) { transition-delay: 0.05s; }
+.mobile-menu.is-open .mobile-menu-nav > *:nth-child(2) { transition-delay: 0.1s; }
+.mobile-menu.is-open .mobile-menu-nav > *:nth-child(3) { transition-delay: 0.15s; }
+.mobile-menu.is-open .mobile-menu-nav > *:nth-child(4) { transition-delay: 0.2s; }
+.mobile-menu.is-open .mobile-menu-nav > *:nth-child(5) { transition-delay: 0.25s; }
+.mobile-menu-nav a:hover,
+.mobile-menu-nav .mobile-dropdown-trigger:hover { color: var(--color-primary); }
+
+.mobile-chevron { font-size: 1.25rem; color: var(--color-text-muted, #6B7280); transition: transform 250ms ease; }
+.mobile-dropdown-trigger.is-expanded .mobile-chevron { transform: rotate(90deg); }
+
+.mobile-dropdown { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+.mobile-dropdown.is-open { max-height: 300px; }
+.mobile-dropdown a {
+  font-family: var(--font-body, 'Inter') !important;
+  font-size: 1rem !important; font-weight: 500 !important;
+  padding: 0.75rem 0 0.75rem 1rem !important;
+  border-bottom: 1px solid #F1F3F5 !important;
+  color: var(--color-text-muted, #6B7280) !important;
+  opacity: 0 !important; transform: none !important; transition: none !important;
+}
+.mobile-menu.is-open .mobile-dropdown a { opacity: 1 !important; }
+.mobile-dropdown a:hover { color: var(--color-primary) !important; }
+
+.mobile-menu-footer {
+  margin-top: auto; padding-top: 1.5rem;
+  display: flex; flex-direction: column; gap: 0.75rem;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.3s ease 0.35s, transform 0.3s ease 0.35s;
+}
+.mobile-menu.is-open .mobile-menu-footer { opacity: 1; transform: translateY(0); }
+
+.mobile-menu-phone {
+  font-size: 1.125rem; font-weight: 500;
+  color: var(--color-text-muted, #6B7280); display: flex; align-items: center; gap: 8px; text-decoration: none;
+}
+.mobile-menu-cta {
+  display: block; width: 100%; padding: 1rem;
+  background: var(--color-primary); color: white;
+  text-align: center; font-weight: 600; font-size: 1.125rem;
+  border-radius: 0.5rem; text-decoration: none;
+  transition: background 150ms ease;
+}
+.mobile-menu-cta:hover { background: var(--color-primary-dark, #1D4ED8); }
+
+/* ── Mobile header (simple row) ── */
+.mobile-header { display: none; }
+
+@media (max-width: 900px) {
+  .header-grid-wrapper { display: none !important; }
+  .mobile-header {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--color-bg, #fff); padding: 0 1rem; height: 64px;
+  }
+  .mobile-logo-icon {
+    background: transparent !important;
+    width: auto !important; height: 44px !important;
+    max-width: 200px !important;
+  }
+  .mobile-logo-icon:not(:has(img)) {
+    background: rgba(0,0,0,0.04) !important;
+    width: 38px !important; height: 38px !important;
+  }
+  .mobile-logo-icon .logo-initial { color: white; font-size: 1rem; }
+  .mobile-logo-text { color: var(--color-text, #1A1A2E) !important; font-size: 1.2rem; }
+  .hamburger { display: flex; }
+}
+@media (min-width: 901px) {
+  .mobile-menu { display: none !important; }
+  .hamburger { display: none !important; }
+}
+
+/* Push page content below fixed header */
+:global(body) { padding-top: 0; }
+</style>
+
+<script>
+  const headerWrapper = document.getElementById('header-wrapper');
+  window.addEventListener('scroll', () => {
+    headerWrapper?.classList.toggle('is-scrolled', window.scrollY > 50);
+  });
+
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  hamburger?.addEventListener('click', () => {
+    const isOpen = mobileMenu?.classList.contains('is-open');
+    mobileMenu?.classList.toggle('is-open');
+    hamburger.classList.toggle('is-active');
+    hamburger.setAttribute('aria-expanded', String(!isOpen));
+    document.body.style.overflow = isOpen ? '' : 'hidden';
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu?.classList.contains('is-open')) {
+      mobileMenu.classList.remove('is-open');
+      hamburger?.classList.remove('is-active');
+      hamburger?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // Services dropdown on mobile
+  document.querySelectorAll('.mobile-dropdown-trigger').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const dropdown = trigger.nextElementSibling as HTMLElement;
+      dropdown?.classList.toggle('is-open');
+      trigger.classList.toggle('is-expanded');
+      trigger.setAttribute('aria-expanded', String(dropdown?.classList.contains('is-open')));
+    });
+  });
+</script>

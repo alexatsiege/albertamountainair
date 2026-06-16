@@ -1,0 +1,399 @@
+---
+interface Props {
+  eyebrow?: string;
+  heading?: string;
+}
+
+const {
+  eyebrow = 'What We Offer',
+  heading = 'Comprehensive HVAC & Plumbing Services',
+} = Astro.props;
+
+interface Service {
+  name: string;
+  icon: string;
+  slug: string;
+}
+
+const servicesData = [
+  {
+    category: 'AC Services',
+    items: [
+      { name: 'AC Repair & Troubleshooting', icon: 'snow', slug: 'ac-repair' },
+      { name: 'AC Installation', icon: 'snow', slug: 'ac-installation' },
+      { name: 'AC Tune-Up & Maintenance', icon: 'wrench', slug: 'ac-tune-up' },
+      { name: 'Emergency AC Repair', icon: 'siren', slug: 'ac-repair' },
+      { name: 'Refrigerant Recharge', icon: 'drop', slug: 'ac-repair' },
+      { name: 'Compressor Replacement', icon: 'flash', slug: 'ac-repair' },
+    ]
+  },
+  {
+    category: 'Heating & Heat Pumps',
+    items: [
+      { name: 'Heat Pump Installation', icon: 'refresh', slug: 'heat-pump-services' },
+      { name: 'Heat Pump Repair', icon: 'wrench', slug: 'heat-pump-services' },
+      { name: 'Ductless Mini-Splits', icon: 'wind', slug: 'heat-pump-services' },
+      { name: 'Thermostat Upgrades', icon: 'thermometer', slug: 'ac-tune-up' },
+      { name: 'HVAC System Replacement', icon: 'refresh', slug: 'ac-installation' },
+      { name: 'Preventive Maintenance', icon: 'shield', slug: 'ac-tune-up' },
+    ]
+  },
+  {
+    category: 'Indoor Air Quality',
+    items: [
+      { name: 'Air Purifiers', icon: 'leaf', slug: 'indoor-air-quality' },
+      { name: 'UV Air Sanitizers', icon: 'shield', slug: 'indoor-air-quality' },
+      { name: 'Air Duct Cleaning', icon: 'wind', slug: 'indoor-air-quality' },
+      { name: 'Dehumidifiers', icon: 'sun', slug: 'indoor-air-quality' },
+      { name: 'Allergen Reduction', icon: 'heart', slug: 'indoor-air-quality' },
+      { name: 'Whole-Home Ventilation', icon: 'drop', slug: 'indoor-air-quality' },
+    ]
+  }
+];
+
+---
+
+  <!-- OWA Airflow background: flowing arrows + gradient -->
+  <div class="services-bg-brands">
+    <div class="bg-airflow-gradient"></div>
+    <svg class="bg-airflow-arrows" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      {Array.from({ length: 20 }).map((_, i) => (
+        <g opacity="0.07">
+          <path
+            d={`M${i * 65} ${80 + (i % 4) * 100} L${i * 65 + 30} ${80 + (i % 4) * 100} L${i * 65 + 22} ${74 + (i % 4) * 100} M${i * 65 + 30} ${80 + (i % 4) * 100} L${i * 65 + 22} ${86 + (i % 4) * 100}`}
+            stroke="#29b0e5" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"
+          />
+        </g>
+      ))}
+    </svg>
+  </div>
+
+  <div class="services-container">
+    <div class="services-header-wrapper center-heading">
+      <span class="services-eyebrow">{eyebrow}</span>
+      <h2 class="services-heading">{heading}</h2>
+    </div>
+
+    <div class="services-split-layout">
+      <!-- Left Column: Image Only -->
+      <div class="services-left-column">
+        <div class="services-featured-image-warp">
+          <img src="/_assets/HERO-BG.webp" alt="HVAC technicians at work" class="services-featured-image" loading="lazy" decoding="async" />
+        </div>
+      </div>
+
+      <!-- Right Column: Grouped Services Grids (Collapsible) -->
+      <div class="services-categories-wrapper right-column">
+        {servicesData.map((group, index) => (
+          <details class="service-accordion" open={index === 0 ? true : undefined}>
+            <summary class="accordion-header">
+              <h3 class="group-heading">{group.category}</h3>
+              <div class="accordion-icon-wrap">
+                <span class="accordion-icon-bar horizontal"></span>
+                <span class="accordion-icon-bar vertical"></span>
+              </div>
+            </summary>
+            <div class="accordion-body">
+              <div class="services-small-grid">
+                {group.items.map(service => (
+                  <a href={`/${service.slug}`} class="mini-service-card">
+                    <div class="mini-icon">
+                      <!-- OWA arrow icon -->
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;color:var(--color-primary)">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </div>
+                    <span class="mini-title">{service.name}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mini-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.services-condensed {
+  background: var(--color-bg);
+  padding: 80px 24px 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.services-bg-brands {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bg-airflow-gradient {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 10% 50%, color-mix(in srgb, var(--color-primary) 6%, transparent) 0%, transparent 60%);
+}
+.bg-airflow-arrows {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+}
+
+.services-container {
+  max-width: 1040px; margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.services-header-wrapper.center-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.center-heading .services-eyebrow {
+  display: inline-flex; align-items: center;
+  background: var(--color-accent);
+  border-radius: 100px;
+  padding: 8px 24px;
+  font-size: 0.85rem; font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #fff;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(246, 138, 30, 0.3);
+}
+
+.center-heading .services-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--color-primary-dark);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.services-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.services-featured-image-warp {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(15, 34, 64, 0.12);
+  border: 4px solid #fff; /* white frame border */
+  position: relative;
+}
+
+.services-featured-image {
+  width: 100%;
+  height: 100%;
+  min-height: 350px;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .services-split-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+.services-categories-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+.service-accordion {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 40px rgba(15, 34, 64, 0.12);
+  overflow: hidden;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.service-accordion:hover {
+  box-shadow: 0 16px 50px rgba(15, 34, 64, 0.2);
+  transform: translateY(-2px);
+}
+
+.service-accordion[open] {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 50px rgba(15, 34, 64, 0.18);
+  border-color: rgba(15, 34, 64, 0.1);
+}
+
+.accordion-header {
+  list-style: none; /* remove default triangle */
+  padding: 18px 28px;
+  background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(245,247,252,0.6) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: background 300ms ease;
+  border-radius: 12px;
+}
+
+.service-accordion[open] .accordion-header {
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(135deg, rgba(239,243,250,0.5) 0%, rgba(255,255,255,0) 100%);
+  border-bottom: 1px solid rgba(15, 34, 64, 0.06);
+}
+
+.accordion-header::-webkit-details-marker {
+  display: none;
+}
+
+.group-heading {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #1a3a6c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--color-primary); /* Fallback */
+  margin: 0;
+}
+
+.accordion-icon-wrap {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(246, 138, 30, 0.3);
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.accordion-header:hover .accordion-icon-wrap {
+  transform: scale(1.08) rotate(90deg); /* nice animated flip on hover */
+  box-shadow: 0 6px 16px rgba(246, 138, 30, 0.4);
+}
+
+.accordion-icon-bar {
+  position: absolute;
+  background: #ffffff; /* White + and - */
+  border-radius: 2px;
+  transition: transform 300ms ease, opacity 300ms ease;
+}
+
+.accordion-icon-bar.horizontal {
+  width: 16px;
+  height: 2px;
+}
+
+.accordion-icon-bar.vertical {
+  width: 2px;
+  height: 16px;
+}
+
+.service-accordion[open] .accordion-icon-bar.vertical {
+  transform: rotate(90deg);
+  opacity: 0;
+}
+
+.accordion-body {
+  padding: 0 32px 32px 32px;
+  animation: slideDown 300ms ease-out forwards;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.services-small-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mini-service-card {
+  display: flex; align-items: flex-start; gap: 6px;
+  background: #fff; border: 1px solid rgba(0,0,0,0.06);
+  padding: 8px 10px; border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  text-decoration: none; color: var(--color-text);
+  font-weight: 600; font-size: 0.75rem;
+  transition: all 250ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-service-card::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  background: var(--color-primary);
+  opacity: 0; transition: opacity 250ms ease;
+}
+
+.mini-icon {
+  width: 22px; height: 22px;
+  background: var(--color-primary-ultra-light);
+  color: var(--color-primary);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.services-svg-logo { width: 14px; height: 14px; object-fit: contain; }
+
+.mini-title { flex: 1; line-height: 1.25; word-wrap: break-word; hyphens: auto; }
+
+.mini-arrow {
+  width: 12px; height: 12px;
+  color: #9CA3AF;
+  transition: transform 250ms ease, color 250ms ease;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.mini-service-card:hover {
+  transform: translateY(-4px) rotate(-1deg);
+  box-shadow: 0 12px 30px rgba(41, 176, 229, 0.15), 0 0 20px rgba(255,255,255,0.5);
+  border-color: rgba(41, 176, 229, 0.2);
+  z-index: 2;
+}
+
+.mini-service-card:hover::before {
+  opacity: 1;
+  background: var(--color-primary);
+}
+
+.mini-service-card:hover .mini-icon {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.mini-service-card:hover .mini-arrow {
+  transform: translateX(4px);
+  color: var(--color-accent);
+}
+
+@media (max-width: 900px) {
+  .services-small-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .services-small-grid { grid-template-columns: 1fr; }
+  .mini-service-card { padding: 16px; font-size: 0.85rem; }
+}
+</style>

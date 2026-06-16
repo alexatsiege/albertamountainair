@@ -1,0 +1,274 @@
+---
+// TeamSpotlight.astro — Generic team spotlight
+// Data-driven team section using cfg.team[] from client YAML
+
+import DealerLogos from './DealerLogos.astro';
+
+interface Props {
+  team?: { name: string; role: string; blurb: string; image: string }[];
+  logoSrc?: string;
+  associations?: { src: string; alt: string; link?: string }[];
+}
+
+const {
+  team = [
+    {
+      name: 'Your Technician',
+      role: 'Senior HVAC Tech',
+      blurb: 'Our senior technicians bring years of field experience to every job, diagnosing and fixing HVAC issues fast while always keeping you in the loop.',
+      image: '/_assets/TEAM-1.webp',
+    },
+    {
+      name: 'Your Owner',
+      role: 'Owner & Founder',
+      blurb: 'Our owner built this company on honest advice, quality workmanship, and fast response times for local homeowners.',
+      image: '/_assets/TEAM-OWNER.webp',
+    },
+    {
+      name: 'Your Installer',
+      role: 'Lead Installer',
+      blurb: 'Our installation team is certified on all major brands and treats every home with the care and precision it deserves — clean installs, every time.',
+      image: '/_assets/TEAM-2.webp',
+    },
+  ],
+  logoSrc = '/_assets/Logo icon-5.png',
+  associations = [],
+} = Astro.props;
+
+// Always show exactly 3 (left, center, right)
+const [left, center, right] = team.slice(0, 3);
+---
+
+<section class="team-spotlight glass-reveal">
+  <!-- Animated airflow background dots -->
+  <div class="team-bg-pattern" aria-hidden="true">
+    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <g class={`flow-arrow flow-arrow-${i + 1}`} opacity="0.12">
+          <path d={`M${i * 130} 60 L${i * 130 + 40} 60 L${i * 130 + 30} 52 M${i * 130 + 40} 60 L${i * 130 + 30} 68`}
+            stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      ))}
+    </svg>
+  </div>
+
+  <div class="team-container">
+    <div class="spotlight-header center-heading">
+      <span class="spotlight-eyebrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        The Leadership
+      </span>
+      <h2 class="spotlight-heading">Meet Our Team</h2>
+    </div>
+
+    <div class="team-grid">
+
+      <!-- Left card -->
+      {left && (
+        <div class="team-card side-card">
+          <div class="team-image-wrap">
+            <img src={left.image} alt={`${left.name} — ${left.role}`} class="team-img" loading="lazy" decoding="async" />
+            <div class="logo-stamp"><img src={logoSrc} alt="Company Logo" /></div>
+          </div>
+          <div class="team-info">
+            <h3 class="team-name">{left.name}</h3>
+            <span class="team-role">{left.role}</span>
+            <p class="team-blurb">{left.blurb}</p>
+          </div>
+        </div>
+      )}
+
+      <!-- Center card (elevated) -->
+      {center && (
+        <div class="team-card center-card">
+          <div class="team-image-wrap">
+            <img src={center.image} alt={`${center.name} — ${center.role}`} class="team-img" loading="lazy" decoding="async" />
+            <div class="logo-stamp"><img src={logoSrc} alt="Company Logo" /></div>
+          </div>
+          <div class="team-info">
+            <h3 class="team-name">{center.name}</h3>
+            <span class="team-role">{center.role}</span>
+            <p class="team-blurb">{center.blurb}</p>
+          </div>
+        </div>
+      )}
+
+      <!-- Right card -->
+      {right && (
+        <div class="team-card side-card">
+          <div class="team-image-wrap">
+            <img src={right.image} alt={`${right.name} — ${right.role}`} class="team-img" loading="lazy" decoding="async" />
+            <div class="logo-stamp"><img src={logoSrc} alt="Company Logo" /></div>
+          </div>
+          <div class="team-info">
+            <h3 class="team-name">{right.name}</h3>
+            <span class="team-role">{right.role}</span>
+            <p class="team-blurb">{right.blurb}</p>
+          </div>
+        </div>
+      )}
+
+    </div>
+
+    {associations && associations.length > 0 && (
+      <div class="team-associations" style="position: relative; z-index: 10;">
+        <DealerLogos logos={associations} theme="dark" />
+      </div>
+    )}
+  </div>
+
+  <!-- Wavy bottom edge -->
+  <div class="team-wave-bottom" aria-hidden="true">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,20 C120,60 240,0 360,30 C480,60 600,10 720,35 C840,60 960,5 1080,30 C1200,55 1320,10 1440,25 L1440,80 L0,80 Z" fill="var(--color-bg, #ffffff)" />
+    </svg>
+  </div>
+</section>
+
+<style>
+.team-spotlight {
+  padding: 100px 24px 120px;
+  background: linear-gradient(135deg,
+    rgba(20, 60, 100, 0.98) 0%,
+    rgba(41, 176, 229, 0.90) 60%,
+    rgba(45, 134, 200, 0.95) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Wavy bottom divider */
+.team-wave-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+  line-height: 0;
+}
+.team-wave-bottom svg {
+  display: block;
+  width: 100%;
+  height: 80px;
+}
+
+/* Animated airflow arrows background */
+.team-bg-pattern {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
+.flow-arrow { animation: flow-drift 6s ease-in-out infinite; }
+.flow-arrow-1  { animation-delay: 0s; }
+.flow-arrow-2  { animation-delay: 0.5s; }
+.flow-arrow-3  { animation-delay: 1s; }
+.flow-arrow-4  { animation-delay: 1.5s; }
+.flow-arrow-5  { animation-delay: 2s; }
+.flow-arrow-6  { animation-delay: 2.5s; }
+.flow-arrow-7  { animation-delay: 3s; }
+.flow-arrow-8  { animation-delay: 3.5s; }
+.flow-arrow-9  { animation-delay: 4s; }
+.flow-arrow-10 { animation-delay: 4.5s; }
+.flow-arrow-11 { animation-delay: 5s; }
+.flow-arrow-12 { animation-delay: 5.5s; }
+@keyframes flow-drift {
+  0%, 100% { transform: translateX(0) opacity(0.08); }
+  50%       { transform: translateX(20px); opacity: 0.18; }
+}
+
+.team-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.spotlight-header.center-heading {
+  display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 80px;
+}
+.spotlight-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--color-accent); border-radius: 100px; padding: 8px 24px;
+  font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  color: #fff; margin-bottom: 24px; box-shadow: 0 4px 16px rgba(246, 138, 30, 0.4);
+}
+.spotlight-heading {
+  font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 900; line-height: 1.1; color: #ffffff; margin: 0;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 32px;
+  align-items: end;
+}
+
+@media (max-width: 900px) {
+  .team-grid { grid-template-columns: 1fr; gap: 48px; align-items: center; }
+}
+
+.team-card {
+  display: flex; flex-direction: column;
+  transition: transform 0.3s ease;
+}
+.team-card:hover { transform: translateY(-8px); }
+
+.center-card { transform: translateY(-40px); z-index: 2; }
+.center-card:hover { transform: translateY(-48px); }
+@media (max-width: 900px) {
+  .center-card, .center-card:hover { transform: translateY(0) !important; }
+  .team-card:hover { transform: translateY(-8px); }
+}
+
+.team-image-wrap {
+  position: relative; width: 220px; height: 220px;
+  margin: 0 auto; border-radius: 50%; z-index: 2;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  border: 4px solid rgba(255,255,255,0.2);
+}
+.center-card .team-image-wrap { width: 260px; height: 260px; }
+
+.team-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+.logo-stamp {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  padding: 8px;
+  border: 2px solid rgba(41, 176, 229, 0.3);
+}
+.center-card .logo-stamp { width: 68px; height: 68px; bottom: 8px; right: 8px; }
+.logo-stamp img { width: 100%; height: auto; }
+
+.team-info {
+  text-align: center;
+  background: #ffffff;
+  border-radius: 160px 160px 24px 24px;
+  padding: 130px 24px 32px;
+  margin-top: -110px;
+  position: relative; z-index: 1;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+}
+.center-card .team-info {
+  border-radius: 200px 200px 24px 24px;
+  padding: 150px 32px 40px;
+  margin-top: -130px;
+}
+
+.team-name {
+  font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800;
+  color: var(--color-primary-dark); margin: 0 0 4px 0;
+}
+.center-card .team-name { font-size: 1.75rem; color: var(--color-accent); }
+
+.team-role {
+  display: block; font-size: 0.875rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--color-text-muted); margin-bottom: 16px;
+}
+
+.team-blurb { font-size: 0.95rem; line-height: 1.6; color: #475569; margin: 0; }
+</style>

@@ -1,0 +1,415 @@
+---
+// CompanyVideo.astro — Cinematic company/brand video module
+// Accepts a YouTube video ID or a full embed URL.
+// Renders a custom thumbnail + play overlay, swapping to the iframe on click
+// so the video doesn't auto-load on page open.
+
+interface Props {
+  videoId?: string;          // YouTube video ID  e.g. "dQw4w9WgXcQ"
+  videoEmbedUrl?: string;    // Full custom embed URL (overrides videoId)
+  videoSrc?: string;         // Local MP4 path e.g. "/_assets/OWA Commercial.mp4"
+  thumbnailUrl?: string;     // Custom poster image (falls back to YouTube maxres)
+  heading?: string;
+  subheading?: string;
+  eyebrow?: string;
+  stats?: { value: string; label: string }[];
+  clientName?: string;
+}
+
+const {
+  videoId,
+  videoEmbedUrl,
+  videoSrc,
+  thumbnailUrl,
+  heading    = "See Your Company in Action",
+  subheading = "From repairs to installations, see how our team helps homeowners stay comfortable with dependable heating and cooling service.",
+  eyebrow    = "Our Story",
+  stats      = [
+    { value: "5★",       label: "Rated on Google"          },
+    { value: "10,000+",  label: "Happy Customers"          },
+    { value: "True 24/7", label: "Emergency Service"        },
+    { value: "<30 Sec",  label: "Talk to a Real Person"    },
+  ],
+  clientName = "Your Company",
+} = Astro.props;
+
+const isLocalVideo = !!videoSrc;
+
+// Build the embed src — append autoplay=1 so it plays when the overlay is clicked
+const embedSrc = videoEmbedUrl
+  ?? (videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1` : null);
+
+// Thumbnail: custom → YouTube maxres → YouTube hq
+const thumb = thumbnailUrl
+  ?? (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null);
+
+const hasVideo = isLocalVideo || !!embedSrc;
+---
+
+<section class="cv-section glass-reveal" id="company-video">
+
+  <!-- Background accent -->
+  <div class="cv-bg-orb cv-orb-1" aria-hidden="true"></div>
+  <div class="cv-bg-orb cv-orb-2" aria-hidden="true"></div>
+
+  <div class="cv-container">
+
+    <!-- Header text -->
+    <div class="cv-header">
+      <span class="cv-eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+          <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+        </svg>
+        {eyebrow}
+      </span>
+      <h2 class="cv-heading">{heading}</h2>
+      <p class="cv-sub">{subheading}</p>
+    </div>
+
+    <!-- Video player -->
+    <div class="cv-player-wrap">
+      {hasVideo ? (
+        <div class="cv-player" id="cv-player"
+          data-embed={!isLocalVideo ? embedSrc : undefined}
+          data-local={isLocalVideo ? videoSrc : undefined}>
+
+          {/* Thumbnail / poster overlay */}
+          {thumb
+            ? <img src={thumb} alt={`${clientName} company video`} class="cv-thumb" loading="lazy" />
+            : <div class="cv-thumb cv-thumb-blank"></div>
+          }
+
+          {/* Hidden native video element (local MP4 only) */}
+          {isLocalVideo && (
+            <video
+              id="cv-native"
+              src={videoSrc}
+              class="cv-native-video"
+              controls
+              preload="none"
+              playsinline
+            />
+          )}
+
+          {/* Play button */}
+          <button class="cv-play-btn" id="cv-play" aria-label="Play video">
+            <span class="cv-play-ring"></span>
+            <span class="cv-play-ring cv-ring-2"></span>
+            <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+          </button>
+
+          {/* Gradient overlay */}
+          <div class="cv-overlay" aria-hidden="true"></div>
+        </div>
+      ) : (
+        <div class="cv-no-video">
+          <p>Set <code>videoId</code> or <code>videoEmbedUrl</code> in the client YAML to display a video here.</p>
+        </div>
+      )}
+    </div>
+
+    <!-- Stat bar -->
+    {stats && stats.length > 0 && (
+      <div class="cv-stats">
+        {stats.map(s => (
+          <div class="cv-stat">
+            <span class="cv-stat-value">{s.value}</span>
+            <span class="cv-stat-label">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    )}
+
+  </div>
+
+  <!-- Wavy bottom edge -->
+  <div class="cv-wave-bottom" aria-hidden="true">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,20 C120,60 240,0 360,30 C480,60 600,10 720,35 C840,60 960,5 1080,30 C1200,55 1320,10 1440,25 L1440,80 L0,80 Z" fill="var(--color-bg, #ffffff)" />
+    </svg>
+  </div>
+</section>
+
+<style>
+.cv-section {
+  padding: 80px 24px 120px;
+  background: linear-gradient(135deg,
+    rgba(20, 60, 100, 0.98) 0%,
+    rgba(41, 176, 229, 0.90) 60%,
+    rgba(45, 134, 200, 0.95) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ambient glow orbs */
+.cv-bg-orb {
+  position: absolute; border-radius: 50%; pointer-events: none; filter: blur(80px);
+}
+.cv-orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(41,176,229,0.18) 0%, transparent 70%);
+  top: -150px; left: -100px;
+}
+.cv-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(246,138,30,0.12) 0%, transparent 70%);
+  bottom: -100px; right: -80px;
+}
+
+.cv-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+}
+
+/* Wavy bottom divider */
+.cv-wave-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+  line-height: 0;
+}
+.cv-wave-bottom svg {
+  display: block;
+  width: 100%;
+  height: 80px;
+}
+
+/* ── Header ── */
+.cv-header { text-align: center; color: #fff; }
+
+.cv-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent, #f68a1e);
+  margin-bottom: 14px;
+}
+
+.cv-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: #fff;
+  margin: 0 0 14px;
+}
+
+.cv-sub {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.7;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Player ── */
+.cv-player-wrap {
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(41,176,229,0.15),
+    0 32px 80px rgba(0,0,0,0.55),
+    0 0 60px rgba(41,176,229,0.12);
+}
+
+.cv-player {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.cv-thumb {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease, filter 0.4s ease;
+}
+.cv-thumb-blank { background: linear-gradient(135deg, #0f2744, #1a5276); }
+.cv-player:hover .cv-thumb {
+  transform: scale(1.04);
+  filter: brightness(0.75);
+}
+
+/* Gradient overlay on thumb */
+.cv-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.1) 0%,
+    rgba(7,24,40,0.55) 100%
+  );
+  transition: opacity 0.3s ease;
+}
+.cv-player:hover .cv-overlay { opacity: 0.7; }
+
+/* Play button */
+.cv-play-btn {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  background: var(--color-accent, #f68a1e);
+  border: none; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.25s ease;
+  z-index: 10;
+  padding-left: 4px; /* optical centering for triangle */
+}
+.cv-play-btn:hover {
+  transform: translate(-50%, -50%) scale(1.12);
+  background: var(--color-primary, #29b0e5);
+}
+
+/* Pulsing rings */
+.cv-play-ring {
+  position: absolute;
+  inset: 0; border-radius: 50%;
+  border: 2px solid rgba(246,138,30,0.5);
+  animation: cv-ring 2.2s ease-out infinite;
+}
+.cv-ring-2 { animation-delay: 1.1s; border-color: rgba(41,176,229,0.4); }
+@keyframes cv-ring {
+  0%   { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Active iframe state */
+.cv-player iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
+
+/* Local MP4 — hidden until play is clicked */
+.cv-native-video {
+  display: none;
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  background: #000;
+  z-index: 5;
+}
+
+/* No-video placeholder */
+.cv-no-video {
+  aspect-ratio: 16/9;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  border: 2px dashed rgba(255,255,255,0.15);
+}
+.cv-no-video p {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem; text-align: center; padding: 24px;
+}
+.cv-no-video code { color: var(--color-primary); }
+
+/* ── Stats ── */
+.cv-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  width: 100%;
+  background: rgba(255,255,255,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.cv-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 24px 16px;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.cv-stat-value {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.cv-stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.80);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .cv-stats { grid-template-columns: repeat(2, 1fr); }
+  .cv-play-btn { width: 60px; height: 60px; }
+  .cv-section { padding: 60px 16px; }
+}
+</style>
+
+<script>
+  const player  = document.getElementById('cv-player');
+  const playBtn = document.getElementById('cv-play');
+
+  if (player && playBtn) {
+    function activateVideo() {
+      const localSrc = (player as HTMLElement).dataset.local;
+      const embedSrc = (player as HTMLElement).dataset.embed;
+
+      if (localSrc) {
+        // Local MP4 — reveal native video and play
+        const video = document.getElementById('cv-native') as HTMLVideoElement;
+        const thumb  = player.querySelector('.cv-thumb');
+        const overlay = player.querySelector('.cv-overlay');
+        const btn    = player.querySelector('.cv-play-btn');
+        if (thumb)   (thumb as HTMLElement).style.display = 'none';
+        if (overlay) (overlay as HTMLElement).style.display = 'none';
+        if (btn)     (btn as HTMLElement).style.display = 'none';
+        if (video) {
+          video.style.display = 'block';
+          video.play();
+        }
+      } else if (embedSrc) {
+        // YouTube / embed URL — swap content with iframe
+        player.innerHTML = '';
+        const iframe = document.createElement('iframe');
+        iframe.src = embedSrc;
+        iframe.allow = 'autoplay; fullscreen; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
+        player.appendChild(iframe);
+      }
+    }
+
+    player.addEventListener('click', activateVideo);
+    playBtn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateVideo(); }
+    });
+  }
+</script>
