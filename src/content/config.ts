@@ -84,6 +84,7 @@ const pageCollection = defineCollection({
     })).optional(),
     howItWorksHeading: z.string().optional(),
     howItWorksEyebrow: z.string().optional(),
+    howItWorksTheme: z.enum(['orange', 'blue']).optional(),
 
     // Deep-dive Article / 7030 Section
     longFormContent: z.array(z.object({

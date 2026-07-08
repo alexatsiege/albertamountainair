@@ -30,6 +30,7 @@ ctaFormFeatures:
   - "Clear installation next steps"
 howItWorksEyebrow: "Our Hassle-Free Installation & Replacement Process"
 howItWorksHeading: "Get Your AC Replaced Today in 5 Simple Steps"
+howItWorksTheme: "blue"
 pricingHeading: "What Affects AC Replacement Cost?"
 pricingFactors:
   - title: "System Capacity"
@@ -71,4 +72,10 @@ faq:
     a: "Yes. Alberta Mountain Air can help evaluate options based on home size, comfort goals, and budget."
   - q: "Do you provide quotes for replacement?"
     a: "Yes. We can help you understand the scope and next steps for a new cooling system."
+  - q: "How long does AC replacement usually take?"
+    a: "Most replacements can be completed in a day, but timing depends on the system type, installation conditions, and any updates needed to support the new equipment."
+  - q: "Will a new AC help lower energy costs?"
+    a: "A properly sized, higher-efficiency system can improve cooling performance and may reduce energy use compared with an older unit."
+  - q: "Can you replace both the indoor and outdoor parts of the system?"
+    a: "Yes. If a full matched system makes the most sense, Alberta Mountain Air can help plan the replacement so the equipment works together properly."
 ---

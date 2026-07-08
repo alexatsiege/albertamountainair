@@ -33,28 +33,28 @@ locations:
     state: AB
     zip: T2Z 4M8
     slug: calgary
-    placeId: REPLACE_WITH_PLACE_ID
+    placeId: ChIJEWAbm3p3cVMRMetowZGl_qo
   - name: Chestermere
     address: Calgary Region
     city: Chestermere
     state: AB
     zip: ''
     slug: chestermere
-    placeId: REPLACE_WITH_PLACE_ID
+    placeId: ChIJEWAbm3p3cVMRMetowZGl_qo
   - name: Airdrie
     address: Calgary Region
     city: Airdrie
     state: AB
     zip: ''
     slug: airdrie
-    placeId: REPLACE_WITH_PLACE_ID
+    placeId: ChIJEWAbm3p3cVMRMetowZGl_qo
   - name: Okotoks
     address: Calgary Region
     city: Okotoks
     state: AB
     zip: ''
     slug: okotoks
-    placeId: REPLACE_WITH_PLACE_ID
+    placeId: ChIJEWAbm3p3cVMRMetowZGl_qo
 
 team: []
 

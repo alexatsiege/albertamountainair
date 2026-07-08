@@ -14,12 +14,14 @@ interface Props {
   eyebrow?: string;
   steps?: Step[];
   phone?: string;
+  theme?: 'orange' | 'blue';
 }
 
 const {
   heading = "Get Your AC Fixed Today in 5 Simple Steps",
   eyebrow = "Our Hassle-Free Process",
   phone,
+  theme = 'orange',
   steps = [
     {
       number: "01",
@@ -63,7 +65,7 @@ const icons: Record<string, string> = {
 };
 ---
 
-<section class="hiw-section" id="how-it-works">
+<section class="hiw-section" id="how-it-works" data-theme={theme}>
   <div class="hiw-container">
 
     <!-- Header -->
@@ -111,10 +113,25 @@ const icons: Record<string, string> = {
 
 <style>
 .hiw-section {
+  --hiw-accent: var(--color-accent);
+  --hiw-accent-soft: rgba(246,138,30,0.1);
+  --hiw-accent-border: rgba(246,138,30,0.2);
+  --hiw-accent-shadow: rgba(246,138,30,0.4);
+  --hiw-accent-shadow-hover: rgba(246,138,30,0.55);
+  --hiw-accent-hover: #e07a15;
   background: #f8fafc;
   padding: 6rem 1.5rem;
   position: relative;
   overflow: hidden;
+}
+
+.hiw-section[data-theme="blue"] {
+  --hiw-accent: var(--color-primary);
+  --hiw-accent-soft: rgba(11,78,162,0.1);
+  --hiw-accent-border: rgba(11,78,162,0.2);
+  --hiw-accent-shadow: rgba(11,78,162,0.35);
+  --hiw-accent-shadow-hover: rgba(11,78,162,0.45);
+  --hiw-accent-hover: var(--color-primary-dark);
 }
 
 .hiw-container {
@@ -138,7 +155,7 @@ const icons: Record<string, string> = {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--hiw-accent);
   margin-bottom: 1rem;
 }
 .hiw-eyebrow::before,
@@ -147,7 +164,7 @@ const icons: Record<string, string> = {
   display: block;
   width: 32px;
   height: 1.5px;
-  background: var(--color-accent);
+  background: var(--hiw-accent);
   opacity: 0.5;
 }
 
@@ -215,7 +232,7 @@ const icons: Record<string, string> = {
   font-size: 2.8rem;
   font-weight: 900;
   line-height: 1;
-  color: var(--color-accent);
+  color: var(--hiw-accent);
   letter-spacing: -0.02em;
   margin-bottom: 0.25rem;
 }
@@ -225,12 +242,12 @@ const icons: Record<string, string> = {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(246,138,30,0.1);
-  border: 1px solid rgba(246,138,30,0.2);
+  background: var(--hiw-accent-soft);
+  border: 1px solid var(--hiw-accent-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent);
+  color: var(--hiw-accent);
   flex-shrink: 0;
 }
 .hiw-icon-ring svg {
@@ -277,7 +294,7 @@ const icons: Record<string, string> = {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--color-accent);
+  background: var(--hiw-accent);
   color: #fff;
   font-family: var(--font-heading);
   font-size: 1rem;
@@ -285,14 +302,14 @@ const icons: Record<string, string> = {
   padding: 14px 32px;
   border-radius: 100px;
   text-decoration: none;
-  box-shadow: 0 8px 28px rgba(246,138,30,0.4);
+  box-shadow: 0 8px 28px var(--hiw-accent-shadow);
   transition: all 0.2s ease;
   letter-spacing: 0.01em;
 }
 .hiw-cta-btn:hover {
-  background: #e07a15;
+  background: var(--hiw-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 12px 36px rgba(246,138,30,0.55);
+  box-shadow: 0 12px 36px var(--hiw-accent-shadow-hover);
 }
 
 /* Fade in animation */
@@ -327,7 +344,7 @@ const icons: Record<string, string> = {
   }
   .hiw-step-number {
     font-size: 1.8rem;
-    -webkit-text-stroke: 1px rgba(246,138,30,0.5);
+    -webkit-text-stroke: 1px var(--hiw-accent-border);
     min-width: 40px;
   }
   .hiw-icon-ring { display: none; } /* number is enough on mobile */

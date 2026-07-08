@@ -1,10 +1,11 @@
 /**
- * fetch-reviews.js — One Way Air
- * Fetches Google Reviews from all 4 GMB listings via Google Places API.
- * Skips gracefully if GOOGLE_PLACES_API_KEY is not set (dev / local builds).
- * 
- * Place IDs: Set these once you have them from the GMB console.
- * Find yours at: https://developers.google.com/maps/documentation/places/web-service/place-id
+ * fetch-reviews.js — Alberta Mountain Air
+ * Fetches Google Reviews from configured Google Place IDs and writes them
+ * into the Alberta Mountain Air client YAML before build.
+ *
+ * Requires:
+ * - GOOGLE_PLACES_API_KEY
+ * - valid `placeId` values under `locations` in healthy-air-hvac.yaml
  */
 
 import fs from 'fs';
@@ -16,15 +17,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+const yamlPath = path.join(__dirname, '../src/content/clients/healthy-air-hvac.yaml');
 
-// ── One Way Air Place IDs ──────────────────────────────────
-// Replace REPLACE_WITH_PLACE_ID with real Place IDs from GMB
-const LOCATIONS = [
-  { name: 'Fort Myers',    placeId: process.env.OWA_PLACE_ID_FORT_MYERS    || 'REPLACE_WITH_PLACE_ID' },
-  { name: 'Lehigh Acres',  placeId: process.env.OWA_PLACE_ID_LEHIGH_ACRES  || 'REPLACE_WITH_PLACE_ID' },
-  { name: 'Tampa',         placeId: process.env.OWA_PLACE_ID_TAMPA         || 'REPLACE_WITH_PLACE_ID' },
-  { name: 'Naples',        placeId: process.env.OWA_PLACE_ID_NAPLES        || 'REPLACE_WITH_PLACE_ID' },
-];
+function loadClientConfig() {
+  return yaml.load(fs.readFileSync(yamlPath, 'utf8'));
+}
+
+function getConfiguredLocations(doc) {
+  return (doc.locations || [])
+    .filter(location => location.placeId && location.placeId !== 'REPLACE_WITH_PLACE_ID')
+    .map(location => ({
+      name: location.name,
+      placeId: location.placeId,
+    }));
+}
 
 async function fetchPlaceReviews(placeId, locationName) {
   const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=rating,user_ratings_total,reviews&key=${API_KEY}`;
@@ -32,20 +38,21 @@ async function fetchPlaceReviews(placeId, locationName) {
   const data = await res.json();
 
   if (!data.result?.rating) {
-    console.warn(`⚠️  No data for ${locationName} (${placeId})`);
+    console.warn(`⚠️  No review data for ${locationName} (${placeId})`);
     return { rating: null, count: null, reviews: [] };
   }
 
   const reviews = (data.result.reviews || [])
-    .filter(r => r.rating >= 4)
-    .map(r => ({
-      text: r.text,
-      name: r.author_name,
-      rating: r.rating,
-      date: r.relative_time_description || 'Recently',
+    .filter(review => review.rating >= 4)
+    .map(review => ({
+      text: review.text,
+      name: review.author_name,
+      rating: review.rating,
+      date: review.relative_time_description || 'Recently',
     }));
 
   console.log(`✅ ${locationName}: ${data.result.rating}★ (${data.result.user_ratings_total} reviews)`);
+
   return {
     rating: data.result.rating,
     count: data.result.user_ratings_total,
@@ -59,53 +66,48 @@ async function fetchAllReviews() {
     return;
   }
 
-  const hasPlaceIds = LOCATIONS.some(l => l.placeId !== 'REPLACE_WITH_PLACE_ID');
-  if (!hasPlaceIds) {
-    console.log('ℹ️  No Place IDs configured yet — skipping review fetch.');
+  const doc = loadClientConfig();
+  const locations = getConfiguredLocations(doc);
+
+  if (locations.length === 0) {
+    console.log('ℹ️  No valid Place IDs configured in healthy-air-hvac.yaml — skipping review fetch.');
     return;
   }
 
-  console.log('🔄 Fetching live Google Reviews from all One Way Air locations…');
+  console.log(`🔄 Fetching live Google Reviews for ${doc.businessName}...`);
 
   try {
     const results = await Promise.all(
-      LOCATIONS
-        .filter(l => l.placeId !== 'REPLACE_WITH_PLACE_ID')
-        .map(l => fetchPlaceReviews(l.placeId, l.name))
+      locations.map(location => fetchPlaceReviews(location.placeId, location.name))
     );
 
-    // Merge all reviews, deduplicate by name
-    const allReviews = results.flatMap(r => r.reviews);
+    const allReviews = results.flatMap(result => result.reviews);
     const seen = new Set();
-    const dedupedReviews = allReviews.filter(r => {
-      if (seen.has(r.name)) return false;
-      seen.add(r.name);
+    const dedupedReviews = allReviews.filter(review => {
+      const key = `${review.name}:${review.text}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
-    }).slice(0, 10); // Keep top 10
+    }).slice(0, 10);
 
-    // Calculate overall weighted rating
-    const validResults = results.filter(r => r.rating !== null);
+    const validResults = results.filter(result => result.rating !== null);
     const avgRating = validResults.length > 0
-      ? Math.round((validResults.reduce((s, r) => s + r.rating, 0) / validResults.length) * 10) / 10
-      : 4.9;
-    const totalCount = validResults.reduce((s, r) => s + (r.count || 0), 0);
-
-    // Update YAML
-    const yamlPath = path.join(__dirname, '../src/content/clients/one-way-air.yaml');
-    let doc = yaml.load(fs.readFileSync(yamlPath, 'utf8'));
+      ? Math.round((validResults.reduce((sum, result) => sum + result.rating, 0) / validResults.length) * 10) / 10
+      : doc.googleRating || 4.9;
+    const totalCount = validResults.reduce((sum, result) => sum + (result.count || 0), 0);
 
     doc.googleRating = avgRating;
     doc.googleReviewCount = totalCount;
+
     if (dedupedReviews.length > 0) {
       doc.googleReviews = dedupedReviews;
     }
 
     fs.writeFileSync(yamlPath, yaml.dump(doc, { lineWidth: -1 }));
-    console.log(`✅ Updated one-way-air.yaml — ${avgRating}★ across ${totalCount} total reviews`);
-
+    console.log(`✅ Updated healthy-air-hvac.yaml — ${avgRating}★ across ${totalCount} total reviews`);
   } catch (err) {
     console.error('❌ Error fetching Google Reviews:', err);
-    process.exit(0); // Don't fail the build on review fetch errors
+    process.exit(0);
   }
 }
 
