@@ -333,6 +333,36 @@ const animatedHeadline = headline.replace(/\|/g, '<br>');
   box-shadow: 0 8px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
+@media (min-width: 769px) {
+  .hero-content {
+    gap: 18px;
+    padding: 40px 48px;
+  }
+
+  .hero-center-logo,
+  .hero-eyebrow,
+  .hero-eyebrow--slim,
+  .hero-headline,
+  .hero-subheadline,
+  .hero-bullets,
+  .hero-trust-badges,
+  .hero-coupon-ticket {
+    margin-bottom: 0;
+  }
+
+  .hero-headline {
+    line-height: 1.08;
+  }
+
+  .hero-subheadline {
+    max-width: 700px;
+  }
+
+  .hero-actions {
+    margin-top: 6px;
+  }
+}
+
 .hero-center-logo {
   max-width: 130px;
   height: auto;
