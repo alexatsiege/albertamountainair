@@ -7,6 +7,7 @@ phoneId: "calgary-main"
 schema: ["HVACBusiness"]
 showServiceArea: true
 headerVariant: "ppc"
+headerLogoSrc: "/_assets/amalogo.svg"
 heroTemplate: "trust"
 heroPhoneFirst: true
 heroHideValueBar: true

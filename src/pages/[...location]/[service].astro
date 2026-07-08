@@ -68,6 +68,7 @@ export async function getStaticPaths() {
 const { page, client } = Astro.props;
 const { data } = page;
 const cfg = client?.data;
+const headerLogoSrc = data.headerLogoSrc || cfg.logoSrc;
 
 // Determine which sections render per template type
 const isQuote      = data.template === 'quote';
@@ -163,7 +164,7 @@ const townName = cleanSlug
       phone={pagePhone}
       navCTA={cfg.navCTA}
       navCtaUrl={cfg.navCtaUrl}
-      logoSrc={cfg.logoSrc}
+      logoSrc={headerLogoSrc}
     />
   ) : (
     <Header
@@ -177,7 +178,7 @@ const townName = cleanSlug
       state={cfg.state}
       facebook={cfg.facebook}
       instagram={cfg.instagram}
-      logoSrc={cfg.logoSrc}
+      logoSrc={headerLogoSrc}
     />
   )}
 

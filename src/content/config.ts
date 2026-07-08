@@ -11,6 +11,7 @@ const pageCollection = defineCollection({
     ogImage: z.string().optional(),
     focusKeyword: z.string().optional(),
     headerVariant: z.enum(['full', 'ppc']).optional(),
+    headerLogoSrc: z.string().optional(),
 
     // Hero
     heroHeadline: z.string(),
