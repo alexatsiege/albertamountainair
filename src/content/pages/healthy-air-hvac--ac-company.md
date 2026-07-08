@@ -1,0 +1,81 @@
+---
+template: "service"
+metaTitle: "AC Company Calgary | Alberta Mountain Air"
+metaDescription: "Alberta Mountain Air is an AC company in Calgary offering air conditioning repair, installation, replacement, and cooling support for local homeowners."
+formId: "contact-form-calgary"
+phoneId: "calgary-main"
+schema: ["HVACBusiness"]
+showServiceArea: true
+headerVariant: "ppc"
+headerLogoSrc: "/_assets/amalogo.svg"
+heroTemplate: "trust"
+heroPhoneFirst: true
+heroHideValueBar: true
+heroBg: "/_assets/ama-hero-bg.webp"
+promoStamp: "CALGARY|AC COMPANY"
+heroHeadline: "A Calgary|AC Company You Can Trust"
+heroSubheadline: "Alberta Mountain Air helps Calgary homeowners with air conditioning repairs, installations, replacements, and practical cooling guidance for every stage of system ownership."
+heroBullets:
+  - "AC repair and diagnostics"
+  - "Installation and replacement support"
+  - "Local Calgary cooling service"
+ctaHeading: "Talk To A Calgary AC Company"
+ctaSubheading: "Reach out to Alberta Mountain Air for dependable air conditioning help and clear next steps for your home."
+ctaFormSimple: true
+ctaFormServicePreset: "AC Service"
+ctaFormHeadline: "Request AC Service"
+ctaFormFeatures:
+  - "Cooling-focused recommendations"
+  - "Repair and replacement support"
+  - "Straightforward scheduling"
+howItWorksEyebrow: "Our Hassle-Free AC Service Process"
+howItWorksHeading: "Get Help From An AC Company In 5 Simple Steps"
+howItWorksTheme: "blue"
+pricingHeading: "What Can Affect AC Service Costs?"
+pricingFactors:
+  - title: "Type of Cooling Issue"
+    description: "Pricing can vary depending on whether the job involves a repair, a tune-up, a new installation, or replacement planning."
+  - title: "System Age and Condition"
+    description: "Older or heavily worn equipment may need deeper troubleshooting, more parts, or a broader conversation about long-term options."
+  - title: "Project Scope"
+    description: "The layout of the home, access to the equipment, and the amount of work required all play a role in the final scope."
+symptomsHeading: "When It Helps To Call An AC Company"
+symptomsSubheading: "These are some of the most common reasons homeowners reach out for professional cooling support."
+symptoms:
+  - title: "Your AC Is Not Cooling Properly"
+    desc: "Warm air, weak airflow, or rooms that never seem comfortable are signs it may be time for a proper diagnosis."
+  - title: "You Need Guidance, Not Just A Quick Fix"
+    desc: "If you're weighing repair, maintenance, or replacement, an experienced AC company can help explain your options clearly."
+  - title: "You Want One Team For Ongoing Cooling Support"
+    desc: "Working with the same AC company for repairs, tune-ups, and future upgrades can make service simpler and more consistent."
+split:
+  - eyebrow: "Cooling-Focused Service"
+    headline: "One Calgary Team For AC Repairs, Installs, And Replacement Planning"
+    body: "Alberta Mountain Air gives homeowners one reliable place to turn for cooling issues, system upgrades, and practical recommendations based on how the home actually performs."
+    features:
+      - "Repair and diagnostic support"
+      - "Installation and upgrade guidance"
+      - "Recommendations tailored to your home"
+    image: "/_assets/ama-ac-install-team-1600.webp"
+  - eyebrow: "Confidence In Your Next Step"
+    headline: "Get Clear Answers Before You Spend More On Cooling Problems"
+    body: "We focus on helping you understand what is happening with your system, what the realistic options are, and which next step makes the most sense for your budget and comfort goals."
+    features:
+      - "No-pressure communication"
+      - "Practical repair versus replace guidance"
+      - "Dependable Calgary scheduling"
+    image: "/_assets/ama-ac-service-detail-1600.webp"
+faq:
+  - q: "What does your AC company help with?"
+    a: "Alberta Mountain Air helps with air conditioning repairs, diagnostics, installation planning, system replacement, and general cooling support for Calgary homeowners."
+  - q: "Can you help if I do not know whether I need repair or replacement?"
+    a: "Yes. We can assess the system, explain what we are seeing, and help you compare the value of repair versus replacement."
+  - q: "Do you work on older air conditioning systems?"
+    a: "Yes. We can inspect older cooling equipment and help you decide whether it still makes sense to maintain it or start planning for an upgrade."
+  - q: "Can your AC company help with new installations?"
+    a: "Yes. Alberta Mountain Air can help with new system planning, sizing support, and installation guidance for the home."
+  - q: "Do you only serve Calgary?"
+    a: "Calgary is the primary service area, and we may also help homeowners in nearby communities depending on schedule and route."
+  - q: "How do I get started?"
+    a: "The easiest way is to contact Alberta Mountain Air, describe the cooling issue or project, and we will help guide the next step."
+---
