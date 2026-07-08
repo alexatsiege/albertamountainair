@@ -12,7 +12,7 @@ heroPhoneFirst: true
 heroHideValueBar: true
 heroBg: "/_assets/ama-hero-bg.webp"
 promoStamp: "UPGRADE|YOUR COOLING"
-heroHeadline: "Professional|AC Replacement"
+heroHeadline: "Professional|AC Replacement & Installation in Calgary"
 heroSubheadline: "If your cooling system is aging or repair costs keep stacking up, Alberta Mountain Air can help you compare AC replacement options with confidence."
 heroBullets:
   - "Replacement guidance"
