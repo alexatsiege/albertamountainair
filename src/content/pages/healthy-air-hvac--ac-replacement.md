@@ -27,6 +27,8 @@ ctaFormFeatures:
   - "Practical system recommendations"
   - "Options matched to your home"
   - "Clear installation next steps"
+howItWorksEyebrow: "Our Hassle-Free Installation & Replacement Process"
+howItWorksHeading: "Get Your AC Replaced Today in 5 Simple Steps"
 pricingHeading: "What Affects AC Replacement Cost?"
 pricingFactors:
   - title: "System Capacity"
@@ -52,7 +54,7 @@ split:
       - "Replacement planning support"
       - "Home-specific recommendations"
       - "Straightforward quote process"
-    image: "/_assets/one way air team2.webp"
+    image: "/_assets/ama-ac-install-team-1600.webp"
   - eyebrow: "Confidence In The Decision"
     headline: "Know When It Is Time To Move On From Repairs"
     body: "We can help you weigh the cost and value of another repair versus a new system, so your next step is clearer and more intentional."
@@ -60,7 +62,7 @@ split:
       - "Repair versus replace guidance"
       - "Energy-efficiency considerations"
       - "Calgary installation support"
-    image: "/_assets/one way air team10.webp"
+    image: "/_assets/ama-ac-service-detail-1600.webp"
 faq:
   - q: "How do I know if I should replace instead of repair?"
     a: "If your system is older, breaks down frequently, or needs a major repair, replacement may be worth comparing."

@@ -81,6 +81,8 @@ const pageCollection = defineCollection({
       title: z.string(),
       description: z.string(),
     })).optional(),
+    howItWorksHeading: z.string().optional(),
+    howItWorksEyebrow: z.string().optional(),
 
     // Deep-dive Article / 7030 Section
     longFormContent: z.array(z.object({

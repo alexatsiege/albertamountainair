@@ -342,7 +342,11 @@ const townName = (isLocation || isService || isServiceSEO) && slugParts.length >
       />
 
       {/* 3. What to Expect */}
-      <HowItWorks phone={pagePhone} />
+      <HowItWorks
+        phone={pagePhone}
+        heading={data.howItWorksHeading}
+        eyebrow={data.howItWorksEyebrow}
+      />
     </>
   )}
 
